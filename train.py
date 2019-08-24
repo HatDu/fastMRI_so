@@ -1,6 +1,6 @@
 from mmcv import Config
 import argparse
-from core.dataset import create_data_loader
+from core.dataset import create_train_dataloaders
 from tools.imshow import show_images
 import torch
 from core.models import build_model
@@ -65,7 +65,7 @@ def main():
     train_func, eval_func, visualize = get_train_func(cfg)
 
     # Data 
-    train_loader, dev_loader, display_loader = create_data_loader(cfg)
+    train_loader, dev_loader, display_loader = create_train_dataloaders(cfg)
 
     # Start training
     train_cfg = cfg.train
