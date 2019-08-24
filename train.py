@@ -7,10 +7,11 @@ from core.models import build_model
 import pathlib
 from tensorboardX import SummaryWriter
 import os
-import shutil
-from core.train import build_optimizer
-
-
+from core.train import build_optimizer, build_loss, get_train_func, save_model
+import time
+import logging
+import random
+import numpy as np
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--cfg', help='train config file path',
@@ -18,29 +19,19 @@ def parse_args():
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--data_parallel', action='store_true', default=True)
     parser.add_argument('--ckpt', default=None)
+    parser.add_argument('--seed', default=6060, type=int)
     args = parser.parse_args()
     return args
-
-
-def save_model(log_dir, epoch, model, optimizer, best_dev_loss, is_new_best):
-    torch.save(
-        {
-            'epoch': epoch,
-            'model': model.state_dict(),
-            'optimizer': optimizer.state_dict(),
-            'best_dev_loss': best_dev_loss
-        },
-        f=os.path.join(log_dir, 'model.pt')
-    )
-    if is_new_best:
-        shutil.copyfile(os.path.join(log_dir, 'model.pt'),
-                        os.path.join(log_dir, 'best_model.pt'))
-
 
 def main():
     args = parse_args()
     cfg = Config.fromfile(args.cfg)
-    train_loader, dev_loader, display_loader = create_data_loader(cfg)
+    cfg.device = args.device
+    # set seed
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+
     # Log
     logdir = cfg.logdir
     pathlib.Path(cfg.logdir).mkdir(parents=True, exist_ok=True)
@@ -52,21 +43,52 @@ def main():
     # Optimizer and Scheduler
     optimizer, scheduler = build_optimizer(cfg, model)
 
+    # Loss function
+    loss_func = build_loss(cfg)
+
     # Data Parallel training
     if args.data_parallel:
         model = torch.nn.DataParallel(model)
-    save_model(logdir, 0, model, optimizer, 0.01, True)
+
     # Resume
+    start_epoch = 0
+    best_dev_loss = 1e9
     if args.ckpt is not None:
         checkpoint = torch.load(args.ckpt)
         model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        start_epoch = checkpoint['epoch']
+        best_dev_loss = checkpoint['best_dev_loss']
 
-    
-    
-        # optimizer.load_state_dict(checkpoint['optimizer'])
 
-    # for it, data in enumerate(train_loader):
-    #     image, target, mean, std = data[:4]
+    # Train tools
+    train_func, eval_func, visualize = get_train_func(cfg)
+
+    # Data 
+    train_loader, dev_loader, display_loader = create_data_loader(cfg)
+
+    # Start training
+    train_cfg = cfg.train
+    for epoch in range(start_epoch, train_cfg.num_epochs):
+        print('Epoch %d'%epoch)
+        scheduler.step(epoch)
+        train_loss, train_time = train_func(
+            cfg, epoch, model, train_loader, optimizer, loss_func, writer)
+        dev_loss, dev_time = eval_func(cfg, epoch, model, dev_loader, writer)
+        visualize(cfg, epoch, model, display_loader, writer)
+
+        writer.add_scalars('loss_trainval', {'train_loss': train_loss, 'dev_loss': dev_loss}, epoch)
+
+        is_new_best = dev_loss < best_dev_loss
+        best_dev_loss = min(best_dev_loss, dev_loss)
+        save_model(logdir, epoch, model, optimizer, best_dev_loss, is_new_best)
+        logging.info(
+            f'Epoch = [{epoch:4d}/{train_cfg.num_epochs:4d}] TrainLoss = {train_loss:.4g} '
+            f'DevLoss = {dev_loss:.4g} TrainTime = {train_time:.4f}s DevTime = {dev_time:.4f}s',
+        )
+        # if (epoch+1)%5 == 0:
+        #     time.sleep(60*5)
+    writer.close()
 
 
 if __name__ == '__main__':

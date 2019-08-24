@@ -10,7 +10,7 @@ class DataTransform:
         self.use_seed = use_seed
         self.crop = crop
         self.crop_size = crop_size
-    def __call__(self, kspace, target, attrs, fname, slice):
+    def __call__(self, kspace, target, norm, fname, slice):
         kspace = transforms.to_tensor(kspace)
         # Apply mask
         seed = None if not self.use_seed else tuple(map(ord, fname))
@@ -40,5 +40,5 @@ class DataTransform:
             image = image[..., ih: ih + self.crop_size, iw: iw + self.crop_size]
             if target is not None:
                 target = target[..., ih: ih + self.crop_size,iw: iw + self.crop_size]
-        return image, target, mean, std, fname, slice, attrs
+        return image, target, mean, std, norm, fname, slice
         # return image, np.abs(target)

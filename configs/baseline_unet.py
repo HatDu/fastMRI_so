@@ -38,9 +38,9 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=2,
+            batch_size=16,
             shuffle=True,
-            num_workers=0,
+            num_workers=4,
             pin_memory=True,
         )
     ),
@@ -48,7 +48,7 @@ data = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
-                root='data/multicoil_val', 
+                root='data/tmp', 
                 challenge='multicoil', 
                 sample_rate=1.
             )
@@ -73,7 +73,7 @@ data = dict(
         loader = dict(
             batch_size=16,
             shuffle=True,
-            num_workers=8,
+            num_workers=4,
             pin_memory=True,
         )
     )
@@ -88,5 +88,8 @@ train = dict(
     lr_scheduler=dict(
         name = 'StepLR',
         params=dict(step_size=40, gamma=0.1)
-    )
+    ),
+    loss = dict(name='l1_loss', params=None),
+    train_func = dict(name = 'train_slice', params=None),
+    num_epochs=50,
 )

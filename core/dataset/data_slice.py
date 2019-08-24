@@ -41,4 +41,4 @@ class MRI_Data(Dataset):
             kspace = data['kspace'][slice]
             target = data[self.recons_key][slice] if self.recons_key in data else None
             norm, max_volume = data.attrs['norm'], data.attrs['max']
-            return self.transform(kspace, target, [norm, max_volume], fname.name, slice)
+            return self.transform(kspace, target, norm, fname.name, slice)
