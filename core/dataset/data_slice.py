@@ -10,7 +10,7 @@ import random
 
 import h5py
 from torch.utils.data import Dataset
-
+import numpy as np
 
 class MRI_Data(Dataset):
     def __init__(self, transform, root, challenge, sample_rate=1.):
@@ -40,4 +40,5 @@ class MRI_Data(Dataset):
         with h5py.File(fname, 'r') as data:
             kspace = data['kspace'][slice]
             target = data[self.recons_key][slice] if self.recons_key in data else None
-            return self.transform(kspace, target, data.attrs, fname.name, slice)
+            norm, max_volume = data.attrs['norm'], data.attrs['max']
+            return self.transform(kspace, target, [norm, max_volume], fname.name, slice)

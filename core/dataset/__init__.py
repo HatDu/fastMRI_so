@@ -2,33 +2,33 @@ import importlib
 from torch.utils.data import DataLoader
 
 dataset_dict = {
-    'slice_data': ['core.dataset.slice_data']
+    'data_slice': ['core.dataset.data_slice',]
 }
 
 transform_dict = {
-    'slice_transform': ['core.dataset.slice_transform'],
+    'transform_slice': ['core.dataset.transform_slice',],
 }
 
 mask_dict = {
-    'mask_cartesian': ['core.dataset.mask_cartesian'],
+    'mask_cartesian': ['core.dataset.mask_cartesian',],
 }
 
 def get_dataset(name):
     if name not in dataset_dict.keys():
         raise 'No such type dataset'
-    module = importlib.import_module(dataset_dict[name])
+    module = importlib.import_module(dataset_dict[name][0])
     return module.MRI_Data
 
 def get_transform(name):
     if name not in transform_dict.keys():
         raise 'No such transform type'
-    module = importlib.import_module(transform_dict[name])
+    module = importlib.import_module(transform_dict[name][0])
     return module.DataTransform
 
 def get_mask(name):
     if name not in mask_dict.keys():
         raise 'No such transform type'
-    module = importlib.import_module(mask_dict[name])
+    module = importlib.import_module(mask_dict[name][0])
     return module.MaskFunc
 
 def create_dataset(cfg):
@@ -37,7 +37,7 @@ def create_dataset(cfg):
     dataset_cfg = cfg.dataset
 
     maskfunc = get_mask(mask_cfg.name)(**mask_cfg.params)
-    transform = get_transform(transform_cfg)(maskfunc, **transform_cfg.params)
+    transform = get_transform(transform_cfg.name)(maskfunc, **transform_cfg.params)
     data = get_dataset(dataset_cfg.name)(transform, **dataset_cfg.params)
     return data
 

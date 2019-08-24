@@ -1,9 +1,12 @@
 data = dict(
     train = dict(
         dataset = dict(
-            root='data/', 
-            challenge='multicoil', 
-            sample_rate=1.
+            name = 'data_slice',
+            params = dict(
+                root='data/tmp', 
+                challenge='multicoil', 
+                sample_rate=1.
+            )
         ),
         mask=dict(
             name = 'mask_cartesian',
@@ -13,28 +16,30 @@ data = dict(
             )
         ),
         transform=dict(
-            name = 'slice_transform',
+            name = 'transform_slice',
             params = dict(
                 resolution=320, 
                 which_challenge='multicoil', 
-                train=True, 
                 use_seed=True, 
-                crop=False, 
-                crop_size=96
+                crop=True, 
+                crop_size=160
             )
         ),
         loader = dict(
-            batch_size=16,
+            batch_size=2,
             shuffle=True,
-            num_workers=8,
+            num_workers=0,
             pin_memory=True,
         )
     ),
     val = dict(
         dataset = dict(
-            root='data/', 
-            challenge='multicoil', 
-            sample_rate=1.
+            name = 'data_slice',
+            params = dict(
+                root='data/multicoil_val', 
+                challenge='multicoil', 
+                sample_rate=1.
+            )
         ),
         mask=dict(
             name = 'mask_cartesian',
@@ -44,11 +49,10 @@ data = dict(
             )
         ),
         transform=dict(
-            name = 'slice_transform',
+            name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge='multicoil', 
-                train=True, 
+                which_challenge='multicoil',
                 use_seed=True, 
                 crop=False, 
                 crop_size=96
