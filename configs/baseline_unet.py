@@ -1,3 +1,15 @@
+model = dict(
+    name = 'baseline_unet',
+    id = 0,
+    params = dict(
+        in_chans=1, 
+        out_chans=1,
+        chans=32,
+        num_pool_layers=4,
+        drop_prob=0.0
+    )
+)
+
 data = dict(
     train = dict(
         dataset = dict(
@@ -21,7 +33,7 @@ data = dict(
                 resolution=320, 
                 which_challenge='multicoil', 
                 use_seed=True, 
-                crop=True, 
+                crop=False, 
                 crop_size=160
             )
         ),
@@ -64,5 +76,17 @@ data = dict(
             num_workers=8,
             pin_memory=True,
         )
+    )
+)
+
+logdir = 'log/baseline_unet/'
+
+train = dict(
+    optimizer = dict(
+        name = 'Adam', params=dict(lr=1e-3, weight_decay=0.)
+    ),
+    lr_scheduler=dict(
+        name = 'StepLR',
+        params=dict(step_size=40, gamma=0.1)
     )
 )
