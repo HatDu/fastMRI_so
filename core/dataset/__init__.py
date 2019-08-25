@@ -41,7 +41,23 @@ def create_dataset(cfg):
     data = get_dataset(dataset_cfg.name)(transform, **dataset_cfg.params)
     return data
 
-def create_data_loader(cfg):
+def create_infer_dataloader(cfg):
+    data_cfg = cfg.data.test
+    mask_cfg = data_cfg.mask
+    transform_cfg = data_cfg.transform
+    dataset_cfg = data_cfg.dataset
+    mask_func = None
+    if cfg.mask:
+        mask_func = get_mask(mask_cfg.name)(**mask_cfg.params)
+    transform = get_transform(transform_cfg.name)(mask_func, **transform_cfg.params)
+    data = get_dataset(dataset_cfg.name)(transform, **dataset_cfg.params)
+    data_loader = DataLoader(
+        dataset=data,
+        **cfg.data.test.loader
+    )
+    return data_loader
+
+def create_train_dataloaders(cfg):
     train_data = create_dataset(cfg.data.train)
     dev_data = create_dataset(cfg.data.val)
     display_data = [dev_data[i] for i in range(0, len(dev_data), len(dev_data) // 16)]
