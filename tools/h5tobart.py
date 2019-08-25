@@ -2,6 +2,7 @@ import argparse
 import os
 import numpy as np
 import h5py
+import pathlib
 def readcfl(name):
     # get dims from .hdr
     h = open(name + ".hdr", "r")
@@ -17,7 +18,7 @@ def readcfl(name):
 
     # load data and reshape into dims
     d = open(name + ".cfl", "r")
-    a = np.fromfile(d, dtype=np.complex64, count=n);
+    a = np.fromfile(d, dtype=np.complex64, count=n)
     d.close()
     return a.reshape(dims, order='F') # column-major
 
@@ -41,7 +42,7 @@ args = parser.parse_args()
 
 input_dir = args.input_dir
 outputdir = args.output_dir
-
+pathlib.Path(outputdir).mkdir(exist_ok=True)
 for fname in os.listdir(input_dir):
     data = h5py.File(os.path.join(input_dir, fname), 'r')
     kspace = data['kspace']
