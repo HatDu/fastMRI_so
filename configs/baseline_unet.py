@@ -15,7 +15,7 @@ data = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
-                root='data/tmp', 
+                root='data/multicoil_train', 
                 challenge='multicoil', 
                 sample_rate=1.
             )
@@ -48,7 +48,7 @@ data = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
-                root='data/tmp', 
+                root='data/multicoil_val', 
                 challenge='multicoil', 
                 sample_rate=1.
             )
@@ -82,7 +82,7 @@ data = dict(
             name = 'data_slice',
             params = dict(
                 root='data/tmp', 
-                challenge='multicoil', 
+                challenge='multicoil_test_v2', 
                 sample_rate=1.
             )
         ),
