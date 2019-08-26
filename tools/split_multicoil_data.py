@@ -20,6 +20,7 @@ for fname in tqdm(os.listdir(input_dir)):
         kspace = data['kspace']
         target = data['reconstruction_rss']
         norm, max_volume = data.attrs['norm'], data.attrs['max']
+        acquisition =  data.attrs['acquisition']
 
         for i, k in enumerate(kspace):
             t = target[i]
@@ -27,4 +28,5 @@ for fname in tqdm(os.listdir(input_dir)):
             f['kspace'] = k
             f['target'] = t
             f['norm'] = [norm, max_volume]
+            f['acquisition'] = acquisition
             f.close()
