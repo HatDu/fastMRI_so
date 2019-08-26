@@ -2,7 +2,8 @@ import importlib
 from torch.utils.data import DataLoader
 
 dataset_dict = {
-    'data_slice': ['core.dataset.data_slice',]
+    'data_slice': ['core.dataset.data_slice',],
+    'data_split_multicoil': ['core.dataset.data_split_multicoil',]
 }
 
 transform_dict = {
