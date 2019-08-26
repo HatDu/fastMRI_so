@@ -33,9 +33,7 @@ class MRI_Data(Dataset):
             with h5py.File(fname, 'r') as data:
                 kspace = data['kspace']
                 acq = data.attrs['acquisition'] if 'acquisition' in data.attrs else 'None'
-                # print(acq, self.acquisition)
                 if acq in self.acquisition:
-                    # print(acq, acquisition)
                     self.instance_num += 1
                     num_slices = kspace.shape[0]
                     self.examples += [(fname, slice) for slice in range(num_slices)]
