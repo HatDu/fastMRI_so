@@ -18,7 +18,7 @@ acquisition = acquisition_dict[args.acq]
 imnames = sorted(os.listdir(args.src))
 count = 0
 
-for i, name in enumerate(imnames[::-1]):
+for i, name in enumerate(imnames):
     # print(i, name)
     src = os.path.join(args.src, name)
     with h5py.File(src, 'r') as data:
