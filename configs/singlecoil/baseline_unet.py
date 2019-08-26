@@ -10,13 +10,17 @@ model = dict(
     )
 )
 
+acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
+challenge = 'singlecoil'
 data = dict(
     train = dict(
         dataset = dict(
-            name = 'data_split_multicoil',
+            name = 'data_slice',
             params = dict(
-                root='data/multicoil_train_splits',
-                sample_rate=1.
+                root='data/singlecoil_train', 
+                challenge=challenge, 
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
@@ -30,7 +34,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge='multicoil', 
+                which_challenge=challenge, 
                 use_seed=True, 
                 crop=False, 
                 crop_size=160
@@ -39,16 +43,18 @@ data = dict(
         loader = dict(
             batch_size=16,
             shuffle=True,
-            num_workers=8,
+            num_workers=4,
             pin_memory=True,
         )
     ),
     val = dict(
         dataset = dict(
-            name = 'data_split_multicoil',
+            name = 'data_slice',
             params = dict(
-                root='data/multicoil_val_splits',
-                sample_rate=1.
+                root='data/singlecoil_val', 
+                challenge=challenge, 
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
@@ -62,7 +68,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge='multicoil',
+                which_challenge=challenge,
                 use_seed=True, 
                 crop=False, 
                 crop_size=96
@@ -71,7 +77,7 @@ data = dict(
         loader = dict(
             batch_size=16,
             shuffle=True,
-            num_workers=8,
+            num_workers=4,
             pin_memory=True,
         )
     ),
@@ -79,9 +85,10 @@ data = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
-                root='data/tmp', 
-                challenge='multicoil', 
-                sample_rate=1.
+                root='data/singlecoil_test_v2', 
+                challenge=challenge, 
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
@@ -92,7 +99,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge='multicoil',
+                which_challenge=challenge,
                 use_seed=True, 
                 crop=False, 
                 crop_size=96
@@ -101,7 +108,7 @@ data = dict(
         loader = dict(
             batch_size=16,
             shuffle=True,
-            num_workers=8,
+            num_workers=4,
             pin_memory=True,
         )
     )

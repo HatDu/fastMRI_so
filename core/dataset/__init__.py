@@ -47,6 +47,7 @@ def create_infer_dataloader(cfg):
     mask_cfg = data_cfg.mask
     transform_cfg = data_cfg.transform
     dataset_cfg = data_cfg.dataset
+    dataset_cfg.params.acquisition = cfg.acquisition
     mask_func = None
     if cfg.mask:
         mask_func = get_mask(mask_cfg.name)(**mask_cfg.params)

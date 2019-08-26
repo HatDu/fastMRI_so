@@ -20,20 +20,25 @@ def parse_args():
     parser = argparse.ArgumentParser(description='infer')
     parser.add_argument('--cfg', help='config file path',
                         default='configs/baseline_unet.py')
-    parser.add_argument('--ckpt', default='log/baseline_unet/best_model.pt')
-    parser.add_argument('--mask', action='store_true', default=True)
-    parser.add_argument('--acc', default='x4', type=str)
-    parser.add_argument('--out_dir', default='data/infer')
+    parser.add_argument('-c', '--ckpt', default='log/baseline_unet/best_model.pt')
+    parser.add_argument('-m', '--mask', action='store_true', default=True)
+    parser.add_argument('-a', '--acc', default='x4', type=str)
+    parser.add_argument('-acq', '--acquisition', default='both')
+    parser.add_argument('-i', '--input_dir', default=None)
+    parser.add_argument('-o', '--out_dir', default='data/infer')
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--data_parallel', action='store_true', default=True)
-    parser.add_argument('--seed', default=6060, type=int)
     args = parser.parse_args()
     return args
 acceleration_cfgs = dict(
     x4=dict(center_fractions=[0.08], accelerations=[4]),
     x8=dict(center_fractions=[0.04], accelerations=[8])
 )
-
+acquisition = dict(
+    both=['CORPD_FBK', 'CORPDFS_FBK', 'None'],
+    pd=['CORPD_FBK'],
+    pdfs=['CORPDFS_FBK']
+)
 def run_unet(args, model, data_loader):
     model.eval()
     reconstructions = defaultdict(list)
@@ -63,6 +68,9 @@ def main():
     cfg.device = args.device
     cfg.mask = args.mask
     cfg.data.test.mask.params = acceleration_cfgs[args.acc]
+    cfg.acquisition = acquisition[args.acquisition]
+    if args.input_dir is not None:
+        cfg.data.test.dataset.params.root = args.input_dir
     # Log
     out_dir = args.out_dir
     pathlib.Path(out_dir).mkdir(parents=True, exist_ok=True)

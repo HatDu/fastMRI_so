@@ -14,19 +14,30 @@ import random
 import numpy as np
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--cfg', help='train config file path',
-                        default='configs/baseline_unet.py')
+    parser.add_argument('-c', '--cfg', help='train config file path',
+                        default='configs/singlecoil/baseline_unet.py')
     parser.add_argument('--device', default='cuda')
-    parser.add_argument('--data_parallel', action='store_true', default=True)
+    parser.add_argument('-d', '--data_parallel', action='store_true', default=True)
+    parser.add_argument('-acq', '--acquisition', default='both')
+    parser.add_argument('-l', '--logdir', default=None)
     parser.add_argument('--ckpt', default=None)
     parser.add_argument('--seed', default=6060, type=int)
+    
     args = parser.parse_args()
     return args
-
+acquisition = dict(
+    both=['CORPD_FBK', 'CORPDFS_FBK'],
+    pd=['CORPD_FBK'],
+    pdfs=['CORPDFS_FBK']
+)
 def main():
     args = parse_args()
     cfg = Config.fromfile(args.cfg)
     cfg.device = args.device
+    cfg.acquisition = acquisition[args.acquisition]
+    if args.logdir is not None:
+        cfg.logdir = args.logdir
+
     # set seed
     random.seed(args.seed)
     np.random.seed(args.seed)

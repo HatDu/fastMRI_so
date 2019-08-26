@@ -10,6 +10,7 @@ model = dict(
     )
 )
 
+acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
 data = dict(
     train = dict(
         dataset = dict(
@@ -17,7 +18,8 @@ data = dict(
             params = dict(
                 root='data/multicoil_train', 
                 challenge='multicoil', 
-                sample_rate=1.
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
@@ -50,7 +52,8 @@ data = dict(
             params = dict(
                 root='data/multicoil_val', 
                 challenge='multicoil', 
-                sample_rate=1.
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
@@ -81,9 +84,10 @@ data = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
-                root='data/tmp', 
-                challenge='multicoil_test_v2', 
-                sample_rate=1.
+                root='data/multicoil_test_v2', 
+                challenge='multicoil', 
+                sample_rate=1.,
+                acquisition=acquisition
             )
         ),
         mask=dict(
