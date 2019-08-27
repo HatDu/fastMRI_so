@@ -3,33 +3,32 @@
 # sleep 30m
 # CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/baseline_unet.py -acq pdfs -l log/baseline_unet_pdfs
 
-python infer.py --cfg configs/baseline_unet.py -c log/baseline_unet/best_model.pt \
-    -i data/multicoil_val/ -o data/infer \
-    -a x8 -acq both 
-python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-    --challenge multicoil --acquisition CORPD_FBK
-python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-    --challenge multicoil --acquisition CORPDFS_FBK
-# x4
-#pd MSE = 6.711e-11 +/- 9.002e-11 NMSE = 0.008778 +/- 0.005333 PSNR = 35.04 +/- 5.214 SSIM = 0.8971 +/- 0.0662
-#pdfs MSE = 1.386e-11 +/- 1.607e-11 NMSE = 0.01572 +/- 0.01104 PSNR = 34.5 +/- 3.98 SSIM = 0.8271 +/- 0.1629
-# x8
-# pd MSE = 1.698e-10 +/- 2.474e-10 NMSE = 0.02163 +/- 0.0131 PSNR = 31.1 +/- 4.885 SSIM = 0.8418 +/- 0.08396
-# pdfs MSE = 2.327e-11 +/- 2.752e-11 NMSE = 0.02592 +/- 0.01212 PSNR = 32.25 +/- 2.31 SSIM = 0.779 +/- 0.1632
-
-
-# python infer.py --cfg configs/baseline_unet.py -c log/baseline_unet/best_model.pt \
-#     -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
-#     -a x8 -acq both 
-# python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
+# python infer.py --cfg configs/baseline_unet.py -c log/baseline_unet_pd/best_model.pt \
+#     -i data/multicoil_val/ -o data/infer \
+#     -a x4 -acq both 
+# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPD_FBK
-# python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
+# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPDFS_FBK
+# x4
+#pd 5.996e-11 +/- 7.783e-11 NMSE = 0.007918 +/- 0.004785 PSNR = 35.48 +/- 5.028 SSIM = 0.9017 +/- 0.06387
+#pdfs 1.402e-11 +/- 1.846e-11 NMSE = 0.01584 +/- 0.0144 PSNR = 34.56 +/- 4.462 SSIM = 0.8291 +/- 0.1643
+# x8
+# pd MSE = 1.482e-10 +/- 2.173e-10 NMSE = 0.01871 +/- 0.01067 PSNR = 31.71 +/- 4.683 SSIM = 0.8506 +/- 0.07987
+# pdfs MSE = 2.258e-11 +/- 2.749e-11 NMSE = 0.02501 +/- 0.01244 PSNR = 32.42 +/- 2.583 SSIM = 0.7823 +/- 0.1645
+
+python infer.py --cfg configs/baseline_unet.py -c log/baseline_unet_pd/best_model.pt \
+    -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
+    -a x4 -acq both 
+python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPD_FBK
+python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPDFS_FBK
 
 # all x4
-#PD MSE = 1.058e-10 +/- 1.739e-10 NMSE = 0.00957 +/- 0.005942 PSNR = 35.07 +/- 3.595 SSIM = 0.9024 +/- 0.05506
-#PDFS MSE = 1.617e-11 +/- 5.208e-11 NMSE = 0.01608 +/- 0.03861 PSNR = 35.07 +/- 4.654 SSIM = 0.8488 +/- 0.1268
+#PD 9.499e-11 +/- 1.592e-10 NMSE = 0.008633 +/- 0.005819 PSNR = 35.53 +/- 3.631 SSIM = 0.9071 +/- 0.05413
+#PDFS 1.578e-11 +/- 5.663e-11 NMSE = 0.01576 +/- 0.04351 PSNR = 35.25 +/- 4.792 SSIM = 0.8512 +/- 0.1273
 
 # x8
-#PD MSE = 2.661e-10 +/- 4.291e-10 NMSE = 0.0237 +/- 0.01403 PSNR = 31.11 +/- 3.426 SSIM = 0.8468 +/- 0.06922
-#PDFS MSE = 2.78e-11 +/- 7.601e-11 NMSE = 0.02702 +/- 0.05031 PSNR = 32.68 +/- 4.332 SSIM = 0.8054 +/- 0.1353
+#PD 2.332e-10 +/- 3.882e-10 NMSE = 0.02057 +/- 0.01213 PSNR = 31.73 +/- 3.391 SSIM = 0.856 +/- 0.06825
+#PDFS 2.597e-11 +/- 7.06e-11 NMSE = 0.0252 +/- 0.04631 PSNR = 32.98 +/- 4.334 SSIM = 0.8097 +/- 0.1356
