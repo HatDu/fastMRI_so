@@ -32,11 +32,12 @@ def get_mask(name):
     module = importlib.import_module(mask_dict[name][0])
     return module.MaskFunc
 
-def create_dataset(cfg):
+def create_dataset(cfg, acquisition=None):
     mask_cfg = cfg.mask
     transform_cfg = cfg.transform
     dataset_cfg = cfg.dataset
-
+    if acquisition is not None:
+        dataset_cfg.params.acquisition = acquisition
     maskfunc = get_mask(mask_cfg.name)(**mask_cfg.params)
     transform = get_transform(transform_cfg.name)(maskfunc, **transform_cfg.params)
     data = get_dataset(dataset_cfg.name)(transform, **dataset_cfg.params)
@@ -60,7 +61,7 @@ def create_infer_dataloader(cfg):
     return data_loader
 
 def create_train_dataloaders(cfg):
-    train_data = create_dataset(cfg.data.train)
+    train_data = create_dataset(cfg.data.train, cfg.acquisition)
     dev_data = create_dataset(cfg.data.val)
     display_data = [dev_data[i] for i in range(0, len(dev_data), len(dev_data) // 16)]
 
