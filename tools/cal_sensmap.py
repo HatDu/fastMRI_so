@@ -29,3 +29,4 @@ for name in fnames:
         with h5py.File(os.path.join(args.dest, n), 'w') as d:
             d['sensmaps'] = sense_maps
 print('average time:', total_time/len(fnames))
+# average time: 1.3110615470889857/slice
