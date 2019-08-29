@@ -97,8 +97,8 @@ def main():
             f'Epoch = [{epoch:4d}/{train_cfg.num_epochs:4d}] TrainLoss = {train_loss:.4g} '
             f'DevLoss = {dev_loss:.4g} TrainTime = {train_time:.4f}s DevTime = {dev_time:.4f}s',
         )
-        # if (epoch+1)%5 == 0:
-        #     time.sleep(60*5)
+        if (epoch+1)%5 == 0:
+            time.sleep(60*5)
     writer.close()
 
 

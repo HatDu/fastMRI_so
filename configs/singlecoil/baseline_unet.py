@@ -11,14 +11,13 @@ model = dict(
 )
 
 acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
-challenge = 'singlecoil'
 data = dict(
     train = dict(
         dataset = dict(
             name = 'data_slice',
             params = dict(
                 root='data/singlecoil_train', 
-                challenge=challenge, 
+                challenge='singlecoil', 
                 sample_rate=1.,
                 acquisition=acquisition
             )
@@ -34,7 +33,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge=challenge, 
+                which_challenge='singlecoil', 
                 use_seed=True, 
                 crop=False, 
                 crop_size=160
@@ -52,7 +51,7 @@ data = dict(
             name = 'data_slice',
             params = dict(
                 root='data/singlecoil_val', 
-                challenge=challenge, 
+                challenge='singlecoil', 
                 sample_rate=1.,
                 acquisition=acquisition
             )
@@ -68,7 +67,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge=challenge,
+                which_challenge='singlecoil',
                 use_seed=True, 
                 crop=False, 
                 crop_size=96
@@ -86,7 +85,7 @@ data = dict(
             name = 'data_slice',
             params = dict(
                 root='data/singlecoil_test_v2', 
-                challenge=challenge, 
+                challenge='singlecoil', 
                 sample_rate=1.,
                 acquisition=acquisition
             )
@@ -99,7 +98,7 @@ data = dict(
             name = 'transform_slice',
             params = dict(
                 resolution=320, 
-                which_challenge=challenge,
+                which_challenge='singlecoil',
                 use_seed=True, 
                 crop=False, 
                 crop_size=96
@@ -114,7 +113,7 @@ data = dict(
     )
 )
 
-logdir = 'log/baseline_unet/'
+logdir = 'log/s_baseline_unet/'
 
 train = dict(
     optimizer = dict(
