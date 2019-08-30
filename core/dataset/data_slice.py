@@ -37,6 +37,7 @@ class MRI_Data(Dataset):
                     self.instance_num += 1
                     num_slices = kspace.shape[0]
                     self.examples += [(fname, slice) for slice in range(num_slices)]
+        print('total %d samples'%(self.instance_num))
     def __len__(self):
         return len(self.examples)
 
