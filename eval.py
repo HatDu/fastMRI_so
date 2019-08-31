@@ -73,9 +73,14 @@ class Metrics:
         means = self.means()
         stddevs = self.stddevs()
         metric_names = sorted(list(means))
-        return ' '.join(
-            f'{name} = {means[name]:.4g} +/- {2 * stddevs[name]:.4g}' for name in metric_names
-        )
+        str1 = ''
+        for s in metric_names: str1+=',%s'%s
+        str1 += '\n'
+        for s in metric_names: str1+=f',{means[s]:.4g}'
+        str1 += '\n'
+        for s in metric_names: str1+=f',{means[s]:.4g} +/- {2 * stddevs[s]:.4g}'
+        str1 += '\n'
+        return str1
 
 
 def evaluate(args, recons_key):
@@ -86,8 +91,8 @@ def evaluate(args, recons_key):
           args.predictions_path / tgt_file.name) as recons:
             if args.acquisition and args.acquisition != target.attrs['acquisition']:
                 continue
-            target = target[recons_key].value
-            recons = recons['reconstruction'].value
+            target = target[recons_key][()]
+            recons = recons['reconstruction'][()]
             metrics.push(target, recons)
     return metrics
 
