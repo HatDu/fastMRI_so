@@ -13,7 +13,7 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     with tqdm(total=len(data_loader), postfix=[dict(loss=0, avg_loss=0)]) as t:
         for iter, data in enumerate(data_loader):
             input, target, mean, std, norm = data[:5]
-            input = input.unsqueeze(1).to(cfg.device)
+            input = input.to(cfg.device)
             target = target.to(cfg.device)
 
             output = model(input).squeeze(1)

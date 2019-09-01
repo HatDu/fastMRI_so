@@ -1,7 +1,8 @@
 import torch.nn as nn
 import importlib
 model_dict = dict(
-    baseline_unet = 'core.models.unet'
+    baseline_unet = 'core.models.unet',
+    se_unet = 'core.models.sequeeze_excitation'
 )
 
 def build_model(cfg):
