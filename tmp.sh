@@ -5,8 +5,8 @@
 # sleep 30m
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/baseline_unet.py -acq pdfs -l log/baseline_unet_pdfs_128_10
 # train w/o rss
-# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/baseline_unet.py -acq both -l log/baseline_unet_both_128_10
-
+# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/baseline_unet_wo_rss.py -acq both -l log/baseline_unet_wo_rss
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/se_unet.py -acq both -l log/baseline_seunet_wo_rss/
 # CUDA_VISIBLE_DEVICES=2,3 
 # rm -r data/infer/*
 # folder_name='baseline_unet_both_128_10'

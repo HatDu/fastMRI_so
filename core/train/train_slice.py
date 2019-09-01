@@ -55,7 +55,7 @@ def evaluate(cfg, epoch, model, data_loader, writer):
         with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
             for iter, data in enumerate(data_loader):
                 input, target, mean, std, norm = data[:5]
-                input = input.unsqueeze(1).to(cfg.device)
+                # input = input.unsqueeze(1).to(cfg.device)
                 target = target.to(cfg.device)
                 output = model(input).squeeze(1)
                 loss = cal_loss(output, target, mean, std, norm, cfg.device)
@@ -76,7 +76,7 @@ def visualize(cfg, epoch, model, data_loader, writer):
     with torch.no_grad():
         for iter, data in enumerate(data_loader):
             input, target = data[:2]
-            input = input.unsqueeze(1).to(cfg.device)
+            # input = input.unsqueeze(1).to(cfg.device)
             target = target.unsqueeze(1).to(cfg.device)
             output = model(input)
             save_image(target, 'Target')

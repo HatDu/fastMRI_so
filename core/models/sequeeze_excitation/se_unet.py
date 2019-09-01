@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from core.model.sequeeze_excitation.base_module import SELayer, ConvBlock, SEResBlock
+from core.models.sequeeze_excitation.base_module import SELayer, ConvBlock, SEResBlock
 
 
 
