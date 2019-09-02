@@ -40,5 +40,6 @@ class DataTransform:
             image = image[..., ih: ih + self.crop_size, iw: iw + self.crop_size]
             if target is not None:
                 target = target[..., ih: ih + self.crop_size,iw: iw + self.crop_size]
+        image = image.unsqueeze(0)
         return image, target, mean, std, norm, fname, slice
         # return image, np.abs(target)
