@@ -28,6 +28,9 @@ def get_train_func(cfg):
     if func_cfg.name == 'train_slice':
         from core.train.train_slice import train_epoch, evaluate, visualize
         return train_epoch, evaluate, visualize
+    if func_cfg.name == 'train_fusion_silce':
+        from core.train.train_fusion_silce import train_epoch, evaluate, visualize
+        return train_epoch, evaluate, visualize
 
 def save_model(log_dir, epoch, model, optimizer, best_dev_loss, is_new_best):
     torch.save(
