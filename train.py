@@ -83,8 +83,8 @@ def main():
     for epoch in range(start_epoch, train_cfg.num_epochs):
         print('Epoch %d'%epoch)
         scheduler.step(epoch)
-        # train_loss, train_time = train_func(
-        #     cfg, epoch, model, train_loader, optimizer, loss_func, writer)
+        train_loss, train_time = train_func(
+            cfg, epoch, model, train_loader, optimizer, loss_func, writer)
         dev_loss, dev_time = eval_func(cfg, epoch, model, dev_loader, writer)
         visualize(cfg, epoch, model, display_loader, writer)
 

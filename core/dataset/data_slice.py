@@ -23,11 +23,22 @@ class MRI_Data(Dataset):
             else 'reconstruction_rss'
 
         self.examples = []
-        files = list(pathlib.Path(root).iterdir())
+        files = sorted(list(pathlib.Path(root).iterdir()))
+        pd_list = []
+        pdfs_list = []
+        for fname in sorted(files):
+            with h5py.File(fname, 'r') as data:
+                kspace = data['kspace']
+                acq = data.attrs['acquisition'] if 'acquisition' in data.attrs else 'None'
+                if acq == 'CORPD_FBK':
+                    pd_list.append(fname)
+                elif acq == 'CORPDFS_FBK':
+                    pdfs_list.append(fname)
         if sample_rate < 1:
-            random.shuffle(files)
-            num_files = round(len(files) * sample_rate)
-            files = files[:num_files]
+            num_files = round(len(files) * sample_rate)//2
+            pd_list = pd_list[:num_files]
+            pdfs_list = pdfs_list[:num_files]
+        files = pd_list + pdfs_list
         self.instance_num = 0
         for fname in sorted(files):
             with h5py.File(fname, 'r') as data:

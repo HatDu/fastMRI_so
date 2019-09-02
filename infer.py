@@ -45,7 +45,7 @@ def run_unet(args, model, data_loader):
     with torch.no_grad():
         for data in tqdm(data_loader):
             input, target, mean, std, norm, fnames, slices = data
-            input = input.unsqueeze(1).to(args.device)
+            # input = input.unsqueeze(1).to(args.device)
             recons = model(input).to('cpu').squeeze(1)
             for i in range(recons.shape[0]):
                 recons[i] = recons[i] * std[i] + mean[i]

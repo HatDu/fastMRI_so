@@ -7,18 +7,35 @@
 # train w/o rss
 # CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/baseline_unet_wo_rss.py -acq both -l log/baseline_unet_wo_rss
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/se_unet.py -acq both -l log/baseline_seunet_wo_rss/
-# CUDA_VISIBLE_DEVICES=2,3 
+
+CUDA_VISIBLE_DEVICES=2,3 
+cfg_file='configs/se_unet.py'
+ckpt='log/baseline_seunet_wo_rss/best_model.pt'
+
+# val on 20 x4
+rm -r data/infer/*
+python infer.py --cfg $cfg_file -c $ckpt \
+    -i data/multicoil_val/ -o data/infer \
+    -a x4 -acq both 
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPD_FBK
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPDFS_FBK
+
+# val on 20 x8
+rm -r data/infer/*
+python infer.py --cfg $cfg_file -c $ckpt \
+    -i data/multicoil_val/ -o data/infer \
+    -a x8 -acq both 
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPD_FBK
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPDFS_FBK
+rm -r data/infer/*
+
+# val on 199 x4
 # rm -r data/infer/*
-# folder_name='baseline_unet_both_128_10'
-# python infer.py --cfg configs/baseline_unet.py -c log/$folder_name/best_model.pt \
-#     -i data/multicoil_val/ -o data/infer \
-#     -a x4 -acq both 
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPD_FBK
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPDFS_FBK
-# rm -r data/infer/*
-# python infer.py --cfg configs/baseline_unet.py -c log/$folder_name/best_model.pt \
+# python infer.py --cfg $cfg_file  -c $ckpt \
 #     -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
 #     -a x4 -acq both 
 # python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
@@ -26,16 +43,8 @@
 # python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPDFS_FBK
 
-# rm -r data/infer/*
-# python infer.py --cfg configs/baseline_unet.py -c log/$folder_name/best_model.pt \
-#     -i data/multicoil_val/ -o data/infer \
-#     -a x8 -acq both 
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPD_FBK
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPDFS_FBK
-# rm -r data/infer/*
-# python infer.py --cfg configs/baseline_unet.py -c log/$folder_name/best_model.pt \
+# val on 199 x8
+# python infer.py --cfg $cfg_file -c $ckpt \
 #     -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
 #     -a x8 -acq both 
 # python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
