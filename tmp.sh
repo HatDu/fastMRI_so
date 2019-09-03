@@ -20,6 +20,11 @@
 # CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/fusion_unet_residualv2_patch_img.py -acq both -l log/fusion_unet_residualv2_patch_img/
 # CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/fusion_unet_residualv2_whole_img.py -acq both -l log/fusion_unet_residualv2_whole_img/
 
+## unet stack more and deeper
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_more.py -acq both -l log/unet_stack_more/
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_deeper.py -acq both -l log/unet_stack_deeper/
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_more_deeper.py -acq both -l log/unet_stack_more_deeper/
+
 # cfg_file='configs/fusion_unet_guid.py'
 # ckpt='log/fusion_unet_guid/best_model.pt'
 # device='2,3'
