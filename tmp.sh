@@ -13,15 +13,21 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/seunet_rss.py -acq both -l log/seunet_rss/
 
 # train fusion net
-CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_residual.py -acq both -l log/fusion_unet_residual/
-CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_guid.py -acq both -l log/fusion_unet_guid/
-# CUDA_VISIBLE_DEVICES=2,3 
-# cfg_file='configs/se_unet.py'
-# ckpt='log/baseline_seunet_wo_rss/best_model.pt'
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_residual.py -acq both -l log/fusion_unet_residual/
+# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_guid.py -acq both -l log/fusion_unet_guid/
 
-# val on 20 x4
-# rm -r data/infer/*
-# python infer.py --cfg $cfg_file -c $ckpt \
+cfg_file='configs/fusion_unet_residual.py'
+ckpt='log/fusion_unet_residual/best_model.pt'
+device='0,1'
+
+# visualize sensity map
+# CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \
+#     -i data/multicoil_val/ -o data/infer \
+#     -a x4 -acq both 
+
+# # val on 20 x4
+# rm -r data/infer/*.h5
+# CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
 #     -i data/multicoil_val/ -o data/infer \
 #     -a x4 -acq both 
 # python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
@@ -29,20 +35,19 @@ CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_guid.py -acq 
 # python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPDFS_FBK
 
-# val on 20 x8
-# rm -r data/infer/*
-# python infer.py --cfg $cfg_file -c $ckpt \
+# # val on 20 x8
+# rm -r data/infer/*.h5
+# CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
 #     -i data/multicoil_val/ -o data/infer \
 #     -a x8 -acq both 
 # python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPD_FBK
 # python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
 #     --challenge multicoil --acquisition CORPDFS_FBK
-# rm -r data/infer/*
 
 # val on 199 x4
-# rm -r data/infer/*
-# python infer.py --cfg $cfg_file  -c $ckpt \
+# rm -r data/infer/*.h5
+# CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file  -c $ckpt \
 #     -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
 #     -a x4 -acq both 
 # python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \
@@ -51,7 +56,7 @@ CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_guid.py -acq 
 #     --challenge multicoil --acquisition CORPDFS_FBK
 
 # val on 199 x8
-# python infer.py --cfg $cfg_file -c $ckpt \
+# CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
 #     -i /home/amax/SDB/fastmri/multicoil_val -o data/infer \
 #     -a x8 -acq both 
 # python eval.py --target-path /home/amax/SDB/fastmri/multicoil_val --predictions-path data/infer \

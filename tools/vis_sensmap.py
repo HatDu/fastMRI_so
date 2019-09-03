@@ -10,11 +10,15 @@ import h5py
 import numpy as np
 import torch
 from mmcv import Config
+import pathlib
+import matplotlib.pyplot as plt
+import cv2
 
 from core.dataset import create_infer_dataloader
 from core.models import build_model
 from tools.imshow import show_images
-
+from torch.utils.data import DataLoader
+from core.dataset import transforms
 
 def parse_args():
     parser = argparse.ArgumentParser(description='infer')
@@ -42,28 +46,58 @@ acquisition = dict(
 def run_unet(args, model, data_loader):
     model.eval()
     reconstructions = defaultdict(list)
+    results = []
+    outdir = args.out_dir
     with torch.no_grad():
         for data in tqdm(data_loader):
             input, target, mean, std, norm, fnames, slices = data
             # input = input.unsqueeze(1).to(args.device)
             recons = model(input)
-            if type(recons) == list:
-                recons = recons[-1]
-            recons = recons.to('cpu').squeeze(1)
-            for i in range(recons.shape[0]):
-                recons[i] = recons[i] * std[i] + mean[i]
-                reconstructions[fnames[i]].append((slices[i].numpy(), recons[i].numpy()))
+            
+            x, sens_map, fusion, output = recons
+            sens_map = sens_map.to('cpu').numpy()
+            fusion = fusion.to('cpu').squeeze(1).numpy()
+            x = x.to('cpu')
+            output = output.to('cpu').squeeze(1).numpy()
+            results.append([x, sens_map, fusion, output, target.numpy(), fnames, slices])
 
-    reconstructions = {
-        fname: np.stack([pred for _, pred in sorted(slice_preds)])
-        for fname, slice_preds in reconstructions.items()
-    }
-    return reconstructions
+    for rst in results:
+        x, sens_map, fusion, output, target, fnames, slices = rst
+        for i, slce in enumerate(x):
+            rss = transforms.root_sum_of_squares(slce)
+            rss = rss.numpy()
+            sens = sens_map[i]
+            f = fusion[i]
+            out = output[i]
+            name = fnames[i]
+            slice_no = slices[i]
+            t = target[i]
+
+            slce = slce[::4]
+            sens = sens[::4]
+            
+            slce_img = np.hstack(slce)
+            sens_img = np.hstack(sens)
+            fot = np.hstack([rss, f, out, t])
+            err = np.hstack([rss-t, f-t, out-t, t-t])
+            img = np.vstack((slce_img, fot, err))
+            fpath = os.path.join(outdir, 'sens', '%s_%d.png'%(name, slice_no))
+            spath = os.path.join(outdir, 'sens', '%s_%d_sens.png'%(name, slice_no))
+            
+            plt.imsave(fpath, img, cmap='gray')
+            plt.imsave(spath, sens_img, cmap='gray')
+
+
 
 def save_reconstructions(reconstructions, out_dir):
+    out_dir = os.path.join(out_dir, 'sens')
+    pathlib.Path(out_dir).mkdir(exist_ok=True)
     for fname, recons in reconstructions.items():
-        with h5py.File(os.path.join(out_dir, fname), 'w') as f:
-            f.create_dataset('reconstruction', data=recons)
+        for i, r in enumerate(recons):
+            fname = os.path.join(out_dir, fname+'_%d.png'%(i+1))
+            plt.imsave(fname, r, cmap='gray')
+        # with h5py.File(os.path.join(out_dir, fname), 'w') as f:
+        #     f.create_dataset('reconstruction', data=recons)
 
 def main():
     args = parse_args()
@@ -88,8 +122,15 @@ def main():
 
     # data
     dataloader = create_infer_dataloader(cfg)
-    reconstructions = run_unet(args, model, dataloader)
-    save_reconstructions(reconstructions, args.out_dir)
+    # sample
+    dset = dataloader.dataset
+    display_data = [dset[i] for i in range(0, len(dset), len(dset) // 16)]
+    dataloader = DataLoader(
+        dataset=display_data,
+        **cfg.data.test.loader
+    )
+
+    run_unet(args, model, dataloader)
     
 if __name__ == '__main__':
     main()

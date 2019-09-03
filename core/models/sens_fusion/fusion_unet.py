@@ -21,4 +21,4 @@ class FusionUnet(nn.Module):
             output = recon + fusion
         if self.guid:
             return [fusion, output]
-        return [output]
+        return [x, sens_map, fusion, output]
