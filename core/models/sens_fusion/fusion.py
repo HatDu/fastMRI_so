@@ -41,3 +41,19 @@ class SigmoidFusionNet(nn.Module):
         feature = feature.view(B, C, H, W)
         sens_map = self.activation(feature)
         return sens_map
+
+class SigmoidFusionNetv2(nn.Module):
+    def __init__(self, mid_chans=32, num_blocks=4, drop_prob=0.):
+        super().__init__()
+        assert num_blocks >= 2
+        self.feature_conv = [ConvBlock(15, mid_chans, drop_prob)]
+        for i in range(num_blocks-2):
+            self.feature_conv.append(ConvBlock(mid_chans, mid_chans, drop_prob))
+        self.feature_conv.append(ConvBlock(mid_chans, 15, drop_prob))
+        self.feature_conv = nn.Sequential(*self.feature_conv)
+        self.activation = nn.Sigmoid()
+        
+    def forward(self, x):
+        feature = self.feature_conv(x)
+        sens_map = self.activation(feature)
+        return sens_map

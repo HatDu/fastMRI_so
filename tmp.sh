@@ -16,9 +16,13 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_residual.py -acq both -l log/fusion_unet_residual/
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unet_guid.py -acq both -l log/fusion_unet_guid/
 
-cfg_file='configs/fusion_unet_residual.py'
-ckpt='log/fusion_unet_residual/best_model.pt'
-device='0,1'
+# train fusion net v2
+CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/fusion_unet_residualv2_patch_img.py -acq both -l log/fusion_unet_residualv2_patch_img/
+CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/fusion_unet_residualv2_whole_img.py -acq both -l log/fusion_unet_residualv2_whole_img/
+
+# cfg_file='configs/fusion_unet_residual.py'
+# ckpt='log/fusion_unet_residual/best_model.pt'
+# device='0,1'
 
 # visualize sensity map
 # CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \

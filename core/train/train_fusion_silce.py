@@ -21,7 +21,7 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             total_loss = 0
             loss = 0
             output = None
-            for output in outputs:
+            for output in outputs[-1:]:
                 output = output.squeeze(1)
                 loss = loss_func(output, target)
                 total_loss += loss
