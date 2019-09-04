@@ -25,8 +25,8 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_deeper.py -acq both -l log/unet_stack_deeper/
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_more_deeper.py -acq both -l log/unet_stack_more_deeper/
 
-# cfg_file='configs/fusion_unet_guid.py'
-# ckpt='log/fusion_unet_guid/best_model.pt'
+# cfg_file='configs/fusion_unet_residualv2_whole_img.py'
+# ckpt='log/fusion_unet_residualv2_whole_img/best_model.pt'
 # device='2,3'
 
 # visualize sensity map

@@ -7,5 +7,9 @@ def import_model(model_id):
         from .fusion_unetv2 import FusionUnet
         print('using FusionUnet v2 model' )
         return FusionUnet
+    elif model_id == 2:
+        from .fusion_unetv3 import FusionUnet
+        print('using FusionUnet v3 model' )
+        return FusionUnet
     else:
         raise NotImplementedError
