@@ -23,18 +23,21 @@
 ## unet stack more and deeper
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_more.py -acq both -l log/unet_stack_more/
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_deeper.py -acq both -l log/unet_stack_deeper/
-# CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/unet_stack_more_deeper.py -acq both -l log/unet_stack_more_deeper/
+# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/unet_stack_more_deeper.py -acq both -l log/unet_stack_more_deeper/
 
-# cfg_file='configs/fusion_unet_residualv2_whole_img.py'
-# ckpt='log/fusion_unet_residualv2_whole_img/best_model.pt'
-# device='2,3'
+# # train fusion net v3
+# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/fusion_unetv3.py -acq both -l log/fusion_unetv3/
+
+cfg_file='configs/baseline_unet_wo_rss.py'
+ckpt='log/baseline_unet_wo_rss/best_model.pt'
+device='0,1'
 
 # visualize sensity map
 # CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \
 #     -i data/multicoil_val/ -o data/infer \
 #     -a x4 -acq both 
 
-# # val on 20 x4
+# val on 20 x4
 # rm -r data/infer/*.h5
 # CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
 #     -i data/multicoil_val/ -o data/infer \
@@ -45,14 +48,14 @@
 #     --challenge multicoil --acquisition CORPDFS_FBK
 
 # # val on 20 x8
-# rm -r data/infer/*.h5
-# CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
-#     -i data/multicoil_val/ -o data/infer \
-#     -a x8 -acq both 
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPD_FBK
-# python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
-#     --challenge multicoil --acquisition CORPDFS_FBK
+rm -r data/infer/*.h5
+CUDA_VISIBLE_DEVICES=$device python infer.py --cfg $cfg_file -c $ckpt \
+    -i data/multicoil_val/ -o data/infer \
+    -a x8 -acq both 
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPD_FBK
+python eval.py --target-path data/multicoil_val/ --predictions-path data/infer \
+    --challenge multicoil --acquisition CORPDFS_FBK
 
 # val on 199 x4
 # rm -r data/infer/*.h5
