@@ -73,19 +73,25 @@ def run_unet(args, model, data_loader):
             slice_no = slices[i]
             t = target[i]
 
-            slce = slce[::4]
+            slce = slce[::4].numpy()
             sens = sens[::4]
             
-            slce_img = np.hstack(slce)
-            sens_img = np.hstack(sens)
-            fot = np.hstack([rss, f, out, t])
-            err = np.hstack([rss-t, f-t, out-t, t-t])
-            img = np.vstack((slce_img, fot, err))
+            col = len(slce)
+            row = 4
+            num = 1
+            plt.figure()
+            for i, img in enumerate(slce+sens+[rss, f, out, t]+[rss-t, f-t, out-t, t-t]):
+                # plt.axis('off')
+                plt.subplot(row, col, num)
+                plt.imshow(img, cmap='gray')
+                num += 1
+                print(num)
+
             fpath = os.path.join(outdir, 'sens', '%s_%d.png'%(name, slice_no))
-            spath = os.path.join(outdir, 'sens', '%s_%d_sens.png'%(name, slice_no))
-            
-            plt.imsave(fpath, img, cmap='gray')
-            plt.imsave(spath, sens_img, cmap='gray')
+            # spath = os.path.join(outdir, 'sens', '%s_%d_sens.png'%(name, slice_no))
+            # plt.show()
+            plt.savefig(fpath)
+            # plt.imsave(spath, sens_img, cmap='gray')
 
 
 
