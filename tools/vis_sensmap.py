@@ -80,13 +80,31 @@ def run_unet(args, model, data_loader):
             row = 4
             num = 1
             plt.figure()
-            for i, img in enumerate(slce+sens+[rss, f, out, t]+[rss-t, f-t, out-t, t-t]):
+            for i, img in enumerate(slce):
                 # plt.axis('off')
                 plt.subplot(row, col, num)
                 plt.imshow(img, cmap='gray')
                 num += 1
-                print(num)
-
+                
+            # [rss, f, out, t]+[rss-t, f-t, out-t, t-t]
+            for i, img in enumerate(sens):
+                # plt.axis('off')
+                plt.subplot(row, col, num)
+                plt.imshow(img, cmap='gray')
+                num += 1
+                
+            for i, img in enumerate([rss, f, out, t]):
+                # plt.axis('off')
+                plt.subplot(row, col, num)
+                plt.imshow(img, cmap='gray')
+                num += 1
+                
+            for i, img in enumerate([rss-t, f-t, out-t, t-t]):
+                # plt.axis('off')
+                plt.subplot(row, col, num)
+                plt.imshow(img, cmap='gray')
+                num += 1
+                
             fpath = os.path.join(outdir, 'sens', '%s_%d.png'%(name, slice_no))
             # spath = os.path.join(outdir, 'sens', '%s_%d_sens.png'%(name, slice_no))
             # plt.show()
