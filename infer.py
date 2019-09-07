@@ -46,7 +46,8 @@ def run_unet(args, model, data_loader):
         for data in tqdm(data_loader):
             input, target, mean, std, norm, fnames, slices = data
             # input = input.unsqueeze(1).to(args.device)
-            recons = model(input)
+            # recons = model(input.to(args.device))
+            recons = input
             if type(recons) == list:
                 recons = recons[-1]
             recons = recons.to('cpu').squeeze(1)

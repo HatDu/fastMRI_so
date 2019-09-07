@@ -1,5 +1,6 @@
 from core.dataset import transforms
 import numpy as np
+
 class DataTransform:
     def __init__(self, mask_func, resolution, which_challenge, use_seed=True, crop=False, crop_size=96):
         if which_challenge not in ('singlecoil', 'multicoil'):
@@ -16,17 +17,12 @@ class DataTransform:
         seed = None if not self.use_seed else tuple(map(ord, fname))
         masked_kspace, mask = transforms.apply_mask(kspace, self.mask_func, seed)
         # Inverse Fourier Transform to get zero filled solution
-        image = transforms.ifft2(kspace)
+        image = transforms.ifft2(masked_kspace)
         # Crop input image
         image = transforms.complex_center_crop(image, (self.resolution, self.resolution))
-        # Absolute value
-        image = transforms.complex_abs(image)
-        # # Apply Root-Sum-of-Squares if multicoil data
+
         if self.which_challenge == 'multicoil':
             image = transforms.root_sum_of_squares(image)
-        # # Normalize input
-        image, mean, std = transforms.normalize_instance(image, eps=1e-11)
-        image = image.clamp(-6, 6)
         
         if target is not None:
             target = transforms.to_tensor(target)
@@ -40,6 +36,5 @@ class DataTransform:
             image = image[..., ih: ih + self.crop_size, iw: iw + self.crop_size]
             if target is not None:
                 target = target[..., ih: ih + self.crop_size,iw: iw + self.crop_size]
-        image = image.unsqueeze(0)
-        return image, target, mean, std, norm, fname, slice
-        # return image, np.abs(target)
+        
+        return image, target, mask
