@@ -1,14 +1,12 @@
 model = dict(
     name = 'complex_net',
-    id = 0,
+    id = 'unet',
     params = dict(
         in_chans=15, 
         out_chans=15, 
-        inter_chans=32, 
-        nb=5, 
-        nc=5, 
-        activation=True, 
-        norm=None
+        chans=32,
+        drop_prob=0., 
+        num_pool_layers=4,
     )
 )
 

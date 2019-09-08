@@ -34,8 +34,8 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             # output = model(input).squeeze(1)
             output = model(masked_image, masked_kspace, mask)
             loss = loss_func(output, targetk)
-            loss.backward()
             optimizer.zero_grad()
+            loss.backward()
             optimizer.step()
             # calculate loss for compare with validate set
             losses.append(loss.item())
@@ -45,7 +45,7 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             t.postfix[0]["avg_loss"] = '%.4f' % (1000*avg_loss)
             t.update()
             start_iter = time.perf_counter()
-    return np.mean(losses), time.perf_counter() - start_epoch
+    return 1000*np.mean(losses), time.perf_counter() - start_epoch
 
 def cal_loss(output, target, mean, std, norm, device):
     # mean = mean.unsqueeze(1).unsqueeze(2).to(device)
@@ -75,8 +75,8 @@ def evaluate(cfg, epoch, model, data_loader, writer):
                 
                 out_img = reconstruction_img(output)
                 loss = cal_loss(out_img, target, 0, 1, 1., cfg.device)
-                losses.append(loss.item())
-                t.postfix[0]["avg_loss"] = '%.4f' % (np.mean(losses))
+                losses.append(1000*loss.item())
+                t.postfix[0]["avg_loss"] = '%.4f' % (1000*np.mean(losses))
                 t.update()
     return np.mean(losses), time.perf_counter() - start
 

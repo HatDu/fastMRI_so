@@ -31,6 +31,7 @@
 
 # train complex net
 CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/complex_net.py -acq both -l log/complex_net/
+# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/complex_unet.py -acq both -l log/complex_unet/
 
 # cfg_file='configs/complex_net.py'
 # ckpt='log/complex_net/best_model.pt'
