@@ -9,6 +9,7 @@ dataset_dict = {
 transform_dict = {
     'transform_slice': ['core.dataset.transform_slice',],
     'transform_slice_wo_rss': ['core.dataset.transform_slice_wo_rss',],
+    'transform_complex': ['core.dataset.transform_complex',],
 }
 
 mask_dict = {

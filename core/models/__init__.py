@@ -3,7 +3,8 @@ import importlib
 model_dict = dict(
     baseline_unet = 'core.models.unet',
     se_unet = 'core.models.sequeeze_excitation',
-    sens_fusion = 'core.models.sens_fusion'
+    sens_fusion = 'core.models.sens_fusion',
+    complex_net = 'core.models.complex_net'
 )
 
 def build_model(cfg):

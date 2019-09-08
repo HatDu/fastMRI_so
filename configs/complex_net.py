@@ -1,12 +1,14 @@
 model = dict(
-    name = 'baseline_unet',
+    name = 'complex_net',
     id = 0,
     params = dict(
-        in_chans=1, 
-        out_chans=1,
-        chans=32,
-        num_pool_layers=4,
-        drop_prob=0.0
+        in_chans=15, 
+        out_chans=15, 
+        inter_chans=32, 
+        nb=5, 
+        nc=5, 
+        activation=True, 
+        norm=None
     )
 )
 
@@ -30,7 +32,7 @@ data = dict(
             )
         ),
         transform=dict(
-            name = 'transform_slice',
+            name = 'transform_complex',
             params = dict(
                 resolution=320, 
                 which_challenge='multicoil', 
@@ -40,7 +42,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=16,
+            batch_size=8,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
@@ -64,7 +66,7 @@ data = dict(
             )
         ),
         transform=dict(
-            name = 'transform_slice',
+            name = 'transform_complex',
             params = dict(
                 resolution=320, 
                 which_challenge='multicoil',
@@ -95,7 +97,7 @@ data = dict(
             params = dict(center_fractions=[0.08], accelerations=[4]),
         ),
         transform=dict(
-            name = 'transform_slice',
+            name = 'transform_complex',
             params = dict(
                 resolution=320, 
                 which_challenge='multicoil',
@@ -124,10 +126,10 @@ train = dict(
         params=dict(step_size=40, gamma=0.1)
     ),
     loss = dict(name='l1_loss', params=None),
-    train_func = dict(name='train_slice', params=None),
+    train_func = dict(name='train_complex', params=None),
     num_epochs=50,
 )
 
 infer = dict(
-    infer_func = dict(name='slice', params=None)
+    infer_func = dict(name='complex', params=None)
 )

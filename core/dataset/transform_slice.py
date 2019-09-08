@@ -16,7 +16,7 @@ class DataTransform:
         seed = None if not self.use_seed else tuple(map(ord, fname))
         masked_kspace, mask = transforms.apply_mask(kspace, self.mask_func, seed)
         # Inverse Fourier Transform to get zero filled solution
-        image = transforms.ifft2(kspace)
+        image = transforms.ifft2(masked_kspace)
         # Crop input image
         image = transforms.complex_center_crop(image, (self.resolution, self.resolution))
         # Absolute value
