@@ -30,9 +30,9 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/fusion_unetv3.py -acq both -l log/fusion_unetv3/
 
 # train complex net
-CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/complex_net.py -acq both -l log/complex_net/
-# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/complex_unet.py -acq both -l log/complex_unet/
-
+# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/complex_net.py -acq both -l log/complex_net/
+CUDA_VISIBLE_DEVICES=0 python train.py --cfg configs/complex_unet.py -acq both -l log/complex_unet/
+CUDA_VISIBLE_DEVICES=1,2 python train.py --cfg configs/baseline_unet.py -acq both -l log/baseline_unet_128
 # cfg_file='configs/complex_net.py'
 # ckpt='log/complex_net/best_model.pt'
 # device='0,1'

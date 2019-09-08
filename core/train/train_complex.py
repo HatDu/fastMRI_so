@@ -75,7 +75,7 @@ def evaluate(cfg, epoch, model, data_loader, writer):
                 
                 out_img = reconstruction_img(output)
                 loss = cal_loss(out_img, target, 0, 1, 1., cfg.device)
-                losses.append(1000*loss.item())
+                losses.append(loss.item())
                 t.postfix[0]["avg_loss"] = '%.4f' % (1000*np.mean(losses))
                 t.update()
     return np.mean(losses), time.perf_counter() - start

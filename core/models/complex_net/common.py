@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from core.dataset import transforms
+from torch.nn import functional as F
 class complex_conv2d(nn.Module):
     def __init__(self, in_chans, out_chans, ksize, activation=True, norm=None):
         super().__init__()
@@ -40,3 +41,27 @@ def data_consistency(xgen, xk0, mask, noise_lvl=None):
     out_img = transforms.ifft2(out_fft)
     # print(out_img.size(), '2')
     return out_img
+
+def max_pool2d(data, kernel_size):
+    real = data[...,0]
+    imag = data[...,1]
+    
+    pool_real = F.max_pool2d(real, kernel_size=2)
+    pool_imag = F.max_pool2d(imag, kernel_size=2)
+    B, C, H, W = pool_real.size()
+    pool_real = pool_real.view(B, C, H, W, 1)
+    pool_imag = pool_imag.view(B, C, H, W, 1)
+    pool = torch.cat((pool_real, pool_imag), -1)
+    return pool
+
+def interpolate(data, scale_factor=2, mode='bilinear', align_corners=False):
+    real = data[...,0]
+    imag = data[...,1]
+    
+    pool_real = F.interpolate(real, scale_factor=2, mode=mode, align_corners=align_corners)
+    pool_imag = F.interpolate(imag, scale_factor=2, mode=mode, align_corners=align_corners)
+    B, C, H, W = pool_real.size()
+    pool_real = pool_real.view(B, C, H, W, 1)
+    pool_imag = pool_imag.view(B, C, H, W, 1)
+    pool = torch.cat((pool_real, pool_imag), -1)
+    return pool

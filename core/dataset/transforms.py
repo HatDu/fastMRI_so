@@ -193,6 +193,17 @@ def normalize_instance(data, eps=0.):
     std = data.std()
     return normalize(data, mean, std, eps), mean, std
 
+def normalize_complex(data, mean, stddev, eps=0.):
+    return (data - mean) / (stddev + eps)
+
+
+def normalize_complex_instance(data, dim=(0,1), keepdim=True, eps=0.):
+    mean = data.mean(dim, keepdim)
+    tmp = data - mean
+    rst = torch.pow(tmp, 2)
+    td = torch.mean(torch.sum(tmp, -1))
+    std = torch.sqrt(td)
+    return normalize(data, mean, std, eps), mean, std
 
 # Helper functions
 

@@ -14,6 +14,7 @@ def build_model(cfg):
     module = importlib.import_module(model_dict[model_cfg.name])
     Model = module.import_model(model_cfg.id)
     model = Model(**model_cfg.params)
+    print('model parameters:', sum(param.numel() for param in model.parameters()))
     return model.apply(weights_init)
 
 def weights_init(m):
