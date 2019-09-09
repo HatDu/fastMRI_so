@@ -9,10 +9,17 @@ def run_net(args, model, data_loader):
     model.eval()
     reconstructions = defaultdict(list)
     with torch.no_grad():
-        for data in tqdm(data_loader):
-            masked_image, masked_kspace, target, targetk, mask, fnames, slices = data
-            recons = model(masked_image.to(args.device), masked_kspace, mask)
-            # recons = targetk
+        for batch in tqdm(data_loader):
+            data, norm, file_info = batch
+            masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
+            mean, std, norm = norm
+            fnames, slices = file_info
+            # recons = model(masked_image, masked_imagek, mask)
+            recons = target_image
+            b, c, h, w, _ = recons.shape
+            mean = mean.view(b, 1, 1, 1, 1).to(recons.device)
+            std = std.view(b, 1, 1, 1, 1).to(recons.device)
+            recons = recons*std + mean
             # recons = transforms.ifft2(recons)
             recons = transforms.complex_abs(recons)
             recons = transforms.root_sum_of_squares(recons, 1)

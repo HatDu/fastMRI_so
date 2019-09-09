@@ -12,18 +12,27 @@ class DataTransform:
         self.crop_size = crop_size
     def __call__(self, kspace, target, norm, fname, slice):
         kspace = transforms.to_tensor(kspace)
+        target_rss = target
         # Apply mask
         seed = None if not self.use_seed else tuple(map(ord, fname))
         
         image = transforms.ifft2(kspace)
         image = transforms.complex_center_crop(image, (self.resolution, self.resolution))
+        # normalize
+        image, mean, std = transforms.normalize_instance(image, eps=1e-11)
+        target_image = image
         imagek = transforms.fft2(image)
-        masked_kspace, mask = transforms.apply_mask(imagek, self.mask_func, seed)
-        masked_image = transforms.ifft2(masked_kspace)
+        target_imagek = imagek
+        masked_imagek, mask = transforms.apply_mask(imagek, self.mask_func, seed)
+        masked_image = transforms.ifft2(masked_imagek)
 
         if target is not None:
             target = transforms.to_tensor(target)
-
+        # print(norm)
+        # print((image).mean((0,1,2)))
         # print(image.size(), masked_kspace.size(), targetk.size(), mask.size())
         # torch.Size([15, 320, 320, 2]) torch.Size([15, 320, 320, 2]) torch.Size([15, 320, 320, 2]) torch.Size([1, 1, 320, 1])
-        return masked_image, masked_kspace, target, image, mask, fname, slice
+        data = [masked_image, masked_imagek, target_image, target_imagek, mask, target_rss]
+        norm = [mean, std, norm]
+        file_info = [fname, slice]
+        return [data, norm, file_info]

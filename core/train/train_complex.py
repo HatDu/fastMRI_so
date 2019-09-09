@@ -24,12 +24,11 @@ def to_device(tensors, device):
 def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     model.train()
     avg_loss = 0.
-    losses = []
     start_epoch = start_iter = time.perf_counter()
     global_step = epoch * len(data_loader)
     with tqdm(total=len(data_loader), postfix=[dict(loss=0, avg_loss=0)]) as t:
         for iter, data in enumerate(data_loader):
-            masked_image, masked_kspace, target, targetk, mask, fname, slice = data
+            masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
             masked_image, masked_kspace, target, targetk, mask = to_device([masked_image, masked_kspace, target, targetk, mask], cfg.device)
             # output = model(input).squeeze(1)
             output = model(masked_image, masked_kspace, mask)
@@ -37,15 +36,13 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            # calculate loss for compare with validate set
-            losses.append(loss.item())
             avg_loss = 0.99 * avg_loss + 0.01 * loss.item() if iter > 0 else loss.item()
             writer.add_scalars('TrainLoss', {'avg_loss': avg_loss, 'loss': loss.item()}, global_step + iter)
-            t.postfix[0]["loss"] = '%.4f' % (1000*loss.item())
-            t.postfix[0]["avg_loss"] = '%.4f' % (1000*avg_loss)
+            t.postfix[0]["loss"] = '%.4f' % (loss.item())
+            t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
             t.update()
             start_iter = time.perf_counter()
-    return 1000*np.mean(losses), time.perf_counter() - start_epoch
+    return avg_loss, time.perf_counter() - start_epoch
 
 def cal_loss(output, target, mean, std, norm, device):
     # mean = mean.unsqueeze(1).unsqueeze(2).to(device)
@@ -69,14 +66,16 @@ def evaluate(cfg, epoch, model, data_loader, writer):
     with torch.no_grad():
         with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
             for iter, data in enumerate(data_loader):
-                masked_image, masked_kspace, target, targetk, mask, fname, slice = data
+                masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
                 masked_image, masked_kspace, target, targetk, mask = to_device([masked_image, masked_kspace, target, targetk, mask], cfg.device)
                 output = model(masked_image, masked_kspace, mask)
-                
+                print(output.size(), mean.size())
+                output = output*std + mean
                 out_img = reconstruction_img(output)
+                
                 loss = cal_loss(out_img, target, 0, 1, 1., cfg.device)
                 losses.append(loss.item())
-                t.postfix[0]["avg_loss"] = '%.4f' % (1000*np.mean(losses))
+                t.postfix[0]["avg_loss"] = '%.4f' % (np.mean(losses))
                 t.update()
     return np.mean(losses), time.perf_counter() - start
 
@@ -91,7 +90,7 @@ def visualize(cfg, epoch, model, data_loader, writer):
     model.eval()
     with torch.no_grad():
         for iter, data in enumerate(data_loader):
-            masked_image, masked_kspace, target, targetk, mask, fname, slice = data
+            masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
             # to_device([masked_image, masked_kspace, mask], cfg.device)
             output = model(masked_image, masked_kspace, mask)
             # start = time.time()
