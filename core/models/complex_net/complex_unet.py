@@ -117,8 +117,8 @@ class UnetModel(nn.Module):
             output = torch.cat([output, stack.pop()], dim=1)
             output = layer(output)
         output = self.conv2(output)
-
-        return self.dc(output, xk0, mask)
+        # output = self.dc(output, xk0, mask)
+        return output
 
 def get_model(name):
     return UnetModel
