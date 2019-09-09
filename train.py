@@ -83,22 +83,22 @@ def main():
     for epoch in range(start_epoch, train_cfg.num_epochs):
         print('Epoch %d'%epoch)
         scheduler.step(epoch)
-        # train_loss, train_time = train_func(
-        #     cfg, epoch, model, train_loader, optimizer, loss_func, writer)
+        train_loss, train_time = train_func(
+            cfg, epoch, model, train_loader, optimizer, loss_func, writer)
         dev_loss, dev_time = eval_func(cfg, epoch, model, dev_loader, writer)
         visualize(cfg, epoch, model, display_loader, writer)
 
-        # writer.add_scalars('loss_trainval', {'train_loss': train_loss, 'dev_loss': dev_loss}, epoch)
+        writer.add_scalars('loss_trainval', {'train_loss': train_loss, 'dev_loss': dev_loss}, epoch)
 
-        # is_new_best = dev_loss < best_dev_loss
-        # best_dev_loss = min(best_dev_loss, dev_loss)
-        # save_model(logdir, epoch, model, optimizer, best_dev_loss, is_new_best)
-        # logging.info(
-        #     f'Epoch = [{epoch:4d}/{train_cfg.num_epochs:4d}] TrainLoss = {train_loss:.4g} '
-        #     f'DevLoss = {dev_loss:.4g} TrainTime = {train_time:.4f}s DevTime = {dev_time:.4f}s',
-        # )
-        # if (epoch+1)%5 == 0:
-        #     time.sleep(60*5)
+        is_new_best = dev_loss < best_dev_loss
+        best_dev_loss = min(best_dev_loss, dev_loss)
+        save_model(logdir, epoch, model, optimizer, best_dev_loss, is_new_best)
+        logging.info(
+            f'Epoch = [{epoch:4d}/{train_cfg.num_epochs:4d}] TrainLoss = {train_loss:.4g} '
+            f'DevLoss = {dev_loss:.4g} TrainTime = {train_time:.4f}s DevTime = {dev_time:.4f}s',
+        )
+        if (epoch+1)%5 == 0:
+            time.sleep(60*5)
     writer.close()
 
 

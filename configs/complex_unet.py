@@ -11,6 +11,7 @@ model = dict(
 )
 
 acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
+batch_size = 4
 data = dict(
     train = dict(
         dataset = dict(
@@ -40,7 +41,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=8,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
@@ -74,7 +75,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=8,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
@@ -105,7 +106,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=16,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
             pin_memory=True,

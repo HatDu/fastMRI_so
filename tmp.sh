@@ -35,9 +35,9 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/baseline_unet.py -acq both -l log/baseline_unet_128
 
 
-cfg_file='configs/complex_net.py'
-ckpt='log/complex_net/best_model.pt'
-device='0,1'
+cfg_file='configs/complex_unet.py'
+ckpt='log/complex_unet_no_dc/best_model.pt'
+device='0'
 
 # # visualize sensity map
 # CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \

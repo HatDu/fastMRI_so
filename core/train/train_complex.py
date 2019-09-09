@@ -5,11 +5,14 @@ import torch.nn.functional as F
 import numpy as np
 import torchvision
 from core.dataset import transforms
-def reconstruction_img(output):
+def reconstruction_img(output, mean, std):
     '''
     output: B, C, H, W, 2
     '''
-    # out_img = transforms.ifft2(output)
+    b = output.size(0)
+    mean = mean.view(b, 1, 1, 1, 1).to(output.device)
+    std = std.view(b, 1, 1, 1, 1).to(output.device)
+    output = output*std + mean
     out_img = transforms.complex_abs(output)
     out_img = transforms.root_sum_of_squares(out_img, 1)
     return out_img
@@ -27,12 +30,13 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     start_epoch = start_iter = time.perf_counter()
     global_step = epoch * len(data_loader)
     with tqdm(total=len(data_loader), postfix=[dict(loss=0, avg_loss=0)]) as t:
-        for iter, data in enumerate(data_loader):
-            masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
-            masked_image, masked_kspace, target, targetk, mask = to_device([masked_image, masked_kspace, target, targetk, mask], cfg.device)
-            # output = model(input).squeeze(1)
-            output = model(masked_image, masked_kspace, mask)
-            loss = loss_func(output, targetk)
+        for iter, batch in enumerate(data_loader):
+            data, norm, file_info = batch
+            masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
+            masked_image, masked_imagek, mask, target_image = to_device([masked_image, masked_imagek, mask, target_image], cfg.device)
+
+            output = model(masked_image, masked_imagek, mask)
+            loss = loss_func(output, target_image)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -44,20 +48,6 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             start_iter = time.perf_counter()
     return avg_loss, time.perf_counter() - start_epoch
 
-def cal_loss(output, target, mean, std, norm, device):
-    # mean = mean.unsqueeze(1).unsqueeze(2).to(device)
-    # std = std.unsqueeze(1).unsqueeze(2).to(device)
-    # target = target * std + mean
-    # output = output * std + mean
-
-    # norm = norm.unsqueeze(1).unsqueeze(2).to(device)
-    
-    # print(norm.dtype, mean.dtype, output.dtype)
-    # norm = norm.float()
-    # loss = F.mse_loss(output / norm, target / norm, reduction='sum')
-    loss = F.mse_loss(output, target, reduction='sum')
-    return loss
-
 def evaluate(cfg, epoch, model, data_loader, writer):
     model.eval()
     losses = []
@@ -65,15 +55,16 @@ def evaluate(cfg, epoch, model, data_loader, writer):
     
     with torch.no_grad():
         with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
-            for iter, data in enumerate(data_loader):
-                masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
-                masked_image, masked_kspace, target, targetk, mask = to_device([masked_image, masked_kspace, target, targetk, mask], cfg.device)
-                output = model(masked_image, masked_kspace, mask)
-                print(output.size(), mean.size())
-                output = output*std + mean
-                out_img = reconstruction_img(output)
+            for iter, batch in enumerate(data_loader):
+                data, norm, file_info = batch
+                masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
+                mean, std, norm = norm
+                masked_image, masked_imagek, mask, target_rss = to_device([masked_image, masked_imagek, mask, target_rss], cfg.device)
+                output = model(masked_image, masked_imagek, mask)
+                out_img = reconstruction_img(output, mean, std)
                 
-                loss = cal_loss(out_img, target, 0, 1, 1., cfg.device)
+                norm = norm.view(len(norm), 1, 1, 1, 1).float().to(out_img.device)
+                loss = F.mse_loss(out_img / norm, target_rss / norm, reduction='sum')
                 losses.append(loss.item())
                 t.postfix[0]["avg_loss"] = '%.4f' % (np.mean(losses))
                 t.update()
@@ -88,21 +79,26 @@ def visualize(cfg, epoch, model, data_loader, writer):
         writer.add_image(tag, grid, epoch)
 
     model.eval()
+    gt_list = []
+    gen_list = []
+    err_list = []
     with torch.no_grad():
-        for iter, data in enumerate(data_loader):
-            masked_image, masked_kspace, target, targetk, mask, mean, std, fname, slice = data
-            # to_device([masked_image, masked_kspace, mask], cfg.device)
-            output = model(masked_image, masked_kspace, mask)
-            # start = time.time()
-            # about 1e-4 s
-            out_img = reconstruction_img(output)
-            # end = time.time()
-            # print('iter %d, time: %.4f'%(iter, end-start))
-            # print(out_img.size(), target.size())
-            target = target.unsqueeze(1)
+        for iter, batch in enumerate(data_loader):
+            data, norm, file_info = batch
+            masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
+            mean, std, norm = norm
+            masked_image, masked_imagek, mask = to_device([masked_image, masked_imagek, mask], cfg.device)
+            # output = model(masked_image, masked_imagek, mask)
+            out_img = reconstruction_img(masked_image, mean, std)
+            
             out_img = out_img.cpu()
-            out_img = out_img.unsqueeze(1)
-            save_image(target, 'target')
-            save_image(out_img, 'Reconstruction')
-            save_image(torch.abs(target - out_img), 'Error')
-            break
+            gt_list.append(target_rss.unsqueeze(1))
+            gen_list.append(out_img.unsqueeze(1))
+            err_list.append(torch.abs(target_rss - out_img))
+    
+    gt_tensor = torch.cat(gt_list, 0)
+    gen_tensor = torch.cat(gen_list[:8], 0)
+    err_tensor = torch.cat(err_list[:8], 0)
+    save_image(gt_tensor[:16], 'Target')
+    save_image(gen_tensor[:16], 'Reconstruction')
+    save_image(err_tensor.unsqueeze(1)[:16], 'Error')
