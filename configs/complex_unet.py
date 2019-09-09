@@ -40,7 +40,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=4,
+            batch_size=8,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
@@ -74,7 +74,7 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=16,
+            batch_size=8,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
