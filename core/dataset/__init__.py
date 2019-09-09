@@ -3,13 +3,15 @@ from torch.utils.data import DataLoader
 
 dataset_dict = {
     'data_slice': ['core.dataset.data_slice',],
-    'data_split_multicoil': ['core.dataset.data_split_multicoil',]
+    'data_split_multicoil': ['core.dataset.data_split_multicoil',],
+    'data_slice_share': ['core.dataset.data_slice_share',],
 }
 
 transform_dict = {
     'transform_slice': ['core.dataset.transform_slice',],
     'transform_slice_wo_rss': ['core.dataset.transform_slice_wo_rss',],
     'transform_complex': ['core.dataset.transform_complex',],
+    'transform_slice_share': ['core.dataset.transform_slice_share',],
 }
 
 mask_dict = {
