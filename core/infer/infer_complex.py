@@ -14,8 +14,8 @@ def run_net(args, model, data_loader):
             masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
             mean, std, norm = norm
             fnames, slices = file_info
-            # recons = model(masked_image, masked_imagek, mask)
-            recons = target_image
+            recons = model(masked_image, masked_imagek, mask)
+            # recons = target_image
             b, c, h, w, _ = recons.shape
             mean = mean.view(b, 1, 1, 1, 1).to(recons.device)
             std = std.view(b, 1, 1, 1, 1).to(recons.device)

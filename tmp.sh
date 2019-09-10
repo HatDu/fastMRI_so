@@ -36,7 +36,7 @@
 
 
 cfg_file='configs/complex_unet.py'
-ckpt='log/complex_unet_no_dc/best_model.pt'
+ckpt='log/complex_unet_test/best_model.pt'
 device='0'
 
 # # visualize sensity map
