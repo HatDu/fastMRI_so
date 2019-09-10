@@ -27,12 +27,12 @@ class DataTransform:
                 masks = torch.cat(masks, 0)
                 sum_masked_kspaces = masked_kspaces.sum(0)
                 sum_masks = masks.sum(0)
-                mask_mask = sum_masks==True
+                mask_mask = sum_masks>0
                 sum_masks[mask_mask] = 1./sum_masks[mask_mask]
-                mean_masked_kspaces = sum_masks
-                avg_mask = sum_masks
+                mean_masked_kspaces = sum_masked_kspaces
                 # print(c_kspace.size(), c_mask.size(), mean_masked_kspaces.size())
-                fusion = c_kspace + c_mask*mean_masked_kspaces*avg_mask
+                fusion = c_kspace + mean_masked_kspaces
+                # fusion = c_kspace
                 # print(fusion.size())
                 # torch.Size([15, 640, 372, 2]) torch.Size([1, 1, 372, 1]) torch.Size([15, 640, 372, 2])
                 # torch.Size([15, 640, 372, 2])

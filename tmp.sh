@@ -37,15 +37,9 @@
 # # train data share net
 CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/unet_share.py -acq both -l log/unet_share
 
-<<<<<<< HEAD
-cfg_file='configs/complex_unet.py'
-ckpt='log/complex_unet_test/best_model.pt'
-device='0'
-=======
 # cfg_file='configs/baseline_unet.py'
 # ckpt='log/baseline_unet_128/best_model.pt'
 # device='0'
->>>>>>> 0e021dc361777c06078170ed379b1f0dc9d49868
 
 # # visualize sensity map
 # CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \
