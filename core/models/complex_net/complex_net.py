@@ -64,9 +64,7 @@ def data_consistency(xgen, xk0, mask, noise_lvl=None):
         out_fft = (1 - mask) * xgen_fft + (mask * xgen_fft + v * xk0) / (1 + v)
     else:  # noiseless case
         out_fft = (1 - mask) * xgen_fft + xk0
-    # print(out_fft.size(), '1')
     out_img = transforms.ifft2(out_fft)
-    # print(out_img.size(), '2')
     return out_img
 
 class ComplexNet(nn.Module):

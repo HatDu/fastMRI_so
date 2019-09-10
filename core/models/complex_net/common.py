@@ -3,13 +3,13 @@ from torch import nn
 from core.dataset import transforms
 from torch.nn import functional as F
 class complex_conv2d(nn.Module):
-    def __init__(self, in_chans, out_chans, ksize, activation=True, norm=None):
+    def __init__(self, in_chans, out_chans, ksize=3, activation=True, norm=None):
         super().__init__()
         self.conv_real = nn.Conv2d(in_chans, out_chans, ksize, padding=ksize//2)
         self.conv_imag = nn.Conv2d(in_chans, out_chans, ksize, padding=ksize//2)
         self.activation = None
         if activation:
-            self.activation = nn.ReLU()
+            self.activation = nn.ReLU(inplace=True)
     
     def forward(self, x):
         '''
@@ -37,9 +37,7 @@ def data_consistency(xgen, xk0, mask, noise_lvl=None):
         out_fft = (1 - mask) * xgen_fft + (mask * xgen_fft + v * xk0) / (1 + v)
     else:  # noiseless case
         out_fft = (1 - mask) * xgen_fft + xk0
-    # print(out_fft.size(), '1')
     out_img = transforms.ifft2(out_fft)
-    # print(out_img.size(), '2')
     return out_img
 
 def max_pool2d(data, kernel_size):
