@@ -29,10 +29,11 @@ class DataTransform:
                 sum_masks = masks.sum(0)
                 mask_mask = sum_masks==True
                 sum_masks[mask_mask] = 1./sum_masks[mask_mask]
+                mean_masked_kspaces = sum_masks
                 avg_mask = sum_masks
-                print(c_kspace.size(), c_mask.size(), mean_masked_kspaces.size())
+                # print(c_kspace.size(), c_mask.size(), mean_masked_kspaces.size())
                 fusion = c_kspace + c_mask*mean_masked_kspaces*avg_mask
-                print(fusion.size())
+                # print(fusion.size())
                 # torch.Size([15, 640, 372, 2]) torch.Size([1, 1, 372, 1]) torch.Size([15, 640, 372, 2])
                 # torch.Size([15, 640, 372, 2])
                 return fusion, c_mask

@@ -35,7 +35,7 @@
 # CUDA_VISIBLE_DEVICES=2,3 python train.py --cfg configs/baseline_unet.py -acq both -l log/baseline_unet_128
 
 # # train data share net
-# CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/unet_share.py -acq both -l log/unet_share
+CUDA_VISIBLE_DEVICES=0,1 python train.py --cfg configs/unet_share.py -acq both -l log/unet_share
 
 # cfg_file='configs/baseline_unet.py'
 # ckpt='log/baseline_unet_128/best_model.pt'
