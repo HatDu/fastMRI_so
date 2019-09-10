@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from core.dataset import transforms
 class complex_conv2d(nn.Module):
-    def __init__(self, in_chans, out_chans, ksize, activation=True, norm=None):
+    def __init__(self, in_chans, out_chans, ksize=3, activation=True, norm=None):
         super().__init__()
         self.conv_real = nn.Conv2d(in_chans, out_chans, ksize, padding=ksize//2)
         self.conv_imag = nn.Conv2d(in_chans, out_chans, ksize, padding=ksize//2)
@@ -33,12 +33,12 @@ class complex_conv2d_groups(nn.Module):
     def __init__(self, in_chans, inter_chans, out_chans, nb, ksize=3, activation=True, norm=None):
         super().__init__()
         assert nb >= 2
-        conv_blocks = [complex_conv2d(in_chans, inter_chans, activation, norm)]
+        conv_blocks = [complex_conv2d(in_chans, inter_chans, ksize=ksize, activation=activation, norm=norm)]
 
         for i in range(nb-2):
-            conv_blocks.append(complex_conv2d(inter_chans, inter_chans, activation, norm))
+            conv_blocks.append(complex_conv2d(inter_chans, inter_chans, ksize=ksize, activation=activation, norm=norm))
 
-        conv_blocks.append(complex_conv2d(inter_chans, out_chans, activation, norm))
+        conv_blocks.append(complex_conv2d(inter_chans, out_chans, ksize=ksize, activation=activation, norm=norm))
         self.conv_blocks = nn.Sequential(*conv_blocks)
     
     def forward(self, x):
@@ -72,7 +72,7 @@ def data_consistency(xgen, xk0, mask, noise_lvl=None):
 class ComplexNet(nn.Module):
     def __init__(self, in_chans, out_chans, inter_chans, nb, nc, activation=True, norm=None, noise_lvl=None):
         super().__init__()
-        self.conv_groups = nn.ModuleList([complex_conv2d_groups(in_chans, inter_chans, out_chans, nb) for i in range(nc)])
+        self.conv_groups = nn.ModuleList([complex_conv2d_groups(in_chans, inter_chans, out_chans, nb, activation=activation) for i in range(nc)])
         self.dc = data_consistency
         self.nc = nc
         self.noise_lvl = noise_lvl

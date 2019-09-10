@@ -27,9 +27,10 @@ def to_device(tensors, device):
 def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     model.train()
     avg_loss = 0.
+    total_loss = 0.
     start_epoch = start_iter = time.perf_counter()
     global_step = epoch * len(data_loader)
-    with tqdm(total=len(data_loader), postfix=[dict(loss=0, avg_loss=0)]) as t:
+    with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
         for iter, batch in enumerate(data_loader):
             data, norm, file_info = batch
             masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
@@ -40,9 +41,9 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            avg_loss = 0.99 * avg_loss + 0.01 * loss.item() if iter > 0 else loss.item()
-            writer.add_scalars('TrainLoss', {'avg_loss': avg_loss, 'loss': loss.item()}, global_step + iter)
-            t.postfix[0]["loss"] = '%.4f' % (loss.item())
+            total_loss += loss.item()
+            avg_loss = total_loss/(iter+1.0)
+            writer.add_scalar('TrainLoss', avg_loss) 
             t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
             t.update()
             start_iter = time.perf_counter()
@@ -52,7 +53,7 @@ def evaluate(cfg, epoch, model, data_loader, writer):
     model.eval()
     losses = []
     start = time.perf_counter()
-    
+    total_loss = 0.
     with torch.no_grad():
         with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
             for iter, batch in enumerate(data_loader):
@@ -65,10 +66,11 @@ def evaluate(cfg, epoch, model, data_loader, writer):
                 
                 norm = norm.view(len(norm), 1, 1, 1, 1).float().to(out_img.device)
                 loss = F.mse_loss(out_img / norm, target_rss / norm, reduction='sum')
-                losses.append(loss.item())
-                t.postfix[0]["avg_loss"] = '%.4f' % (np.mean(losses))
+                total_loss += loss.item()
+                avg_loss = total_loss/(iter + 1.)
+                t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
                 t.update()
-    return np.mean(losses), time.perf_counter() - start
+    return avg_loss, time.perf_counter() - start
 
 
 def visualize(cfg, epoch, model, data_loader, writer):
