@@ -16,7 +16,10 @@ class complex_conv2d_groups(nn.Module):
         self.conv_blocks = nn.Sequential(*conv_blocks)
     
     def forward(self, x):
-        return self.conv_blocks(x)
+        tmp = x
+        out = self.conv_blocks(x)
+        out += tmp
+        return out
 
 class ComplexNet(nn.Module):
     def __init__(self, in_chans, out_chans, inter_chans, nb, nc, activation=True, norm=None, noise_lvl=None):

@@ -9,7 +9,7 @@ class complex_conv2d(nn.Module):
         self.conv_imag = nn.Conv2d(in_chans, out_chans, ksize, padding=ksize//2)
         self.activation = None
         if activation:
-            self.activation = nn.ReLU(inplace=True)
+            self.activation = nn.ReLU(inplace=False)
     
     def forward(self, x):
         '''
