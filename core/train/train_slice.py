@@ -68,7 +68,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 
                 eval_count += input.size(0)
                 avg_loss_train = total_loss_train/(iter+1.0)
-                avg_loss_eval = total_loss_eval/eval_count
+                avg_loss_eval = (total_loss_eval/eval_count)*100.
                 
                 # record
                 t.postfix[0]["eval_loss"] = '%.4f' % avg_loss_eval

@@ -69,7 +69,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 total_func_loss += loss_f.item() 
                 total_eval_loss += loss_eval.item()
                 count += masked_image.size(0)
-                avg_eval_loss = total_eval_loss/count
+                avg_eval_loss = (total_eval_loss/count)*10.
                 avg_func_loss = total_func_loss/(iter + 1.)
                 t.postfix[0]["eval_loss"] = '%.4f' % (avg_eval_loss)
                 t.postfix[0]["func_loss"] = '%.4f' % (avg_func_loss)
