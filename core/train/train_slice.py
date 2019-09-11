@@ -10,11 +10,16 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     total_loss = 0.
 
     global_step = epoch * len(data_loader)
+    # is_draw = False
     with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
         for iter, data in enumerate(data_loader):
             # featch data
             input, target, mean, std, norm = data[:5]
-
+            
+            # # draw network graph
+            # if not is_draw:
+            #     writer.add_graph(model, (input.to(cfg.device), ))
+            #     is_draw = True
             # forward
             output = model(input.to(cfg.device)).squeeze(1)
             loss = loss_func(output, target.to(cfg.device))

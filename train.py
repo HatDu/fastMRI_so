@@ -61,7 +61,8 @@ def main():
     writer = SummaryWriter(os.path.join(logdir, 'log'))
 
     # Model
-    model = build_model(cfg).to((args.device))
+    model = build_model(cfg)
+    model = model.to((args.device))
     
     # Optimizer and Scheduler
     optimizer, scheduler = build_optimizer(cfg, model)
