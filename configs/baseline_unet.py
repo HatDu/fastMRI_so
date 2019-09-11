@@ -18,7 +18,7 @@ data = dict(
             params = dict(
                 root='data/multicoil_train', 
                 challenge='multicoil', 
-                sample_num=20,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),

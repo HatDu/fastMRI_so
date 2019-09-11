@@ -52,7 +52,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
     avg_loss_eval = 0.
     
     with torch.no_grad():
-        with tqdm(total=len(data_loader), postfix=[dict(eval_loss=0., loss_func=0.)]) as t:
+        with tqdm(total=len(data_loader), postfix=[dict(eval_loss=0., func_loss=0.)]) as t:
             for iter, data in enumerate(data_loader):
                 # featch data
                 input, target, mean, std, norm = data[:5]
@@ -71,7 +71,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 
                 # record
                 t.postfix[0]["eval_loss"] = '%.4f' % avg_loss_eval
-                t.postfix[0]["eval_lossfunc"] = '%.4f' % avg_loss_train
+                t.postfix[0]["func_loss"] = '%.4f' % avg_loss_train
                 t.update()
     return avg_loss_train, avg_loss_eval
 

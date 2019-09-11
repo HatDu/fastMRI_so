@@ -4,7 +4,6 @@ import os
 import pathlib
 import random
 import time
-import utils
 
 import numpy as np
 import torch
@@ -91,7 +90,11 @@ def main():
     train_loader, dev_loader, display_loader = create_train_dataloaders(cfg)
 
     # log
-    summary(model, train_loader.dataset[0][0].size())
+    
+    try:
+        summary(model, train_loader.dataset[0][0].size())
+    except:
+        summary(model, [(15, 320, 320, 2), (15, 320, 320, 2),(15, 1, 320, 1)])
     print('start training from epoch %d'%(start_epoch+1))
     print('train on %d samples, total %d slices'%(train_loader.dataset.instance_num, len(train_loader.dataset)))
     print('validate on %d samples, total %d slices'%(dev_loader.dataset.instance_num, len(dev_loader.dataset)))
@@ -118,7 +121,7 @@ def main():
         best_dev_loss = min(best_dev_loss, dev_loss)
         save_model(logdir, epoch, model, optimizer, best_dev_loss, is_new_best)
         if (epoch+1) % 5 == 0:
-            time.sleep(60*5)
+            time.sleep(60)
     writer.close()
 
 

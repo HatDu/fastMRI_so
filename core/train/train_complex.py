@@ -17,60 +17,62 @@ def reconstruction_img(output, mean, std):
     out_img = transforms.root_sum_of_squares(out_img, 1)
     return out_img
 
-def to_device(tensors, device):
-    device_tensor = []
-    for t in tensors:
-        tmp = t.to(device)
-        device_tensor.append(tmp)
-    return device_tensor
-
 def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     model.train()
     avg_loss = 0.
     total_loss = 0.
-    start_epoch = start_iter = time.perf_counter()
     global_step = epoch * len(data_loader)
     with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
         for iter, batch in enumerate(data_loader):
+            # featch data
             data, norm, file_info = batch
             masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
-            masked_image, masked_imagek, mask, target_image = to_device([masked_image, masked_imagek, mask, target_image], cfg.device)
 
+            # forward and backward
             output = model(masked_image, masked_imagek, mask)
-            loss = loss_func(output, target_image)
+            loss = loss_func(output, target_image.to(cfg.device))
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            # log
             total_loss += loss.item()
             avg_loss = total_loss/(iter+1.0)
             writer.add_scalar('TrainLoss', avg_loss) 
             t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
             t.update()
             start_iter = time.perf_counter()
-    return avg_loss, time.perf_counter() - start_epoch
+    return avg_loss
 
-def evaluate(cfg, epoch, model, data_loader, writer):
+def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
     model.eval()
     losses = []
     start = time.perf_counter()
-    total_loss = 0.
+    total_eval_loss = 0.
+    total_func_loss = 0. 
+    avg_eval_loss = 0.
+    avg_func_loss = 0.
     with torch.no_grad():
         with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
             for iter, batch in enumerate(data_loader):
                 data, norm, file_info = batch
                 masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
                 mean, std, norm = norm
-                masked_image, masked_imagek, mask, target_rss = to_device([masked_image, masked_imagek, mask, target_rss], cfg.device)
                 output = model(masked_image, masked_imagek, mask)
+                loss_f = loss_func(output, target_image.to(output.device))
+
                 out_img = reconstruction_img(output, mean, std)
-                
                 norm = norm.view(len(norm), 1, 1, 1, 1).float().to(out_img.device)
-                loss = F.mse_loss(out_img / norm, target_rss / norm, reduction='sum')
-                total_loss += loss.item()
-                avg_loss = total_loss/(iter + 1.)
-                t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
+                loss_eval = F.mse_loss(out_img / norm, target_rss.to(out_img.device) / norm, reduction='sum')
+                
+                total_func_loss += loss_f.item() 
+                total_eval_loss += loss_eval.item()
+                avg_eval_loss = total_eval_loss/(iter + 1.)
+                avg_func_loss = total_func_loss/(iter + 1.)
+                t.postfix[0]["eval_loss"] = '%.4f' % (avg_eval_loss)
+                t.postfix[0]["func_loss"] = '%.4f' % (avg_func_loss)
                 t.update()
-    return avg_loss, time.perf_counter() - start
+    return avg_func_loss, avg_eval_loss
 
 
 def visualize(cfg, epoch, model, data_loader, writer):
@@ -89,8 +91,7 @@ def visualize(cfg, epoch, model, data_loader, writer):
             data, norm, file_info = batch
             masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
             mean, std, norm = norm
-            masked_image, masked_imagek, mask = to_device([masked_image, masked_imagek, mask], cfg.device)
-            # output = model(masked_image, masked_imagek, mask)
+
             out_img = reconstruction_img(masked_image, mean, std)
             
             out_img = out_img.cpu()
@@ -99,8 +100,8 @@ def visualize(cfg, epoch, model, data_loader, writer):
             err_list.append(torch.abs(target_rss - out_img))
     
     gt_tensor = torch.cat(gt_list, 0)
-    gen_tensor = torch.cat(gen_list[:8], 0)
-    err_tensor = torch.cat(err_list[:8], 0)
+    gen_tensor = torch.cat(gen_list, 0)
+    err_tensor = torch.cat(err_list, 0)
     save_image(gt_tensor[:16], 'Target')
     save_image(gen_tensor[:16], 'Reconstruction')
     save_image(err_tensor.unsqueeze(1)[:16], 'Error')
