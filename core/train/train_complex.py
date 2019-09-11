@@ -52,8 +52,9 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
     total_func_loss = 0. 
     avg_eval_loss = 0.
     avg_func_loss = 0.
+    count = 0.
     with torch.no_grad():
-        with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
+        with tqdm(total=len(data_loader), postfix=[dict(eval_loss=0, func_loss=0)]) as t:
             for iter, batch in enumerate(data_loader):
                 data, norm, file_info = batch
                 masked_image, masked_imagek, target_image, target_imagek, mask, target_rss = data
@@ -67,7 +68,8 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 
                 total_func_loss += loss_f.item() 
                 total_eval_loss += loss_eval.item()
-                avg_eval_loss = total_eval_loss/(iter + 1.)
+                count += masked_image.size(0)
+                avg_eval_loss = total_eval_loss/count
                 avg_func_loss = total_func_loss/(iter + 1.)
                 t.postfix[0]["eval_loss"] = '%.4f' % (avg_eval_loss)
                 t.postfix[0]["func_loss"] = '%.4f' % (avg_func_loss)

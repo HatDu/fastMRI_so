@@ -50,7 +50,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
     total_loss_eval = 0.
     avg_loss_train = 0.
     avg_loss_eval = 0.
-    
+    eval_count = 0.
     with torch.no_grad():
         with tqdm(total=len(data_loader), postfix=[dict(eval_loss=0., func_loss=0.)]) as t:
             for iter, data in enumerate(data_loader):
@@ -62,12 +62,13 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 # cal loss
                 target = target.to(cfg.device)
                 train_loss = loss_func(output, target)
-                eval_loss = cal_loss(output, target, mean, std, norm, cfg.device)
+                eval_loss = cal_loss(input.squeeze(1), target, mean, std, norm, cfg.device)
                 total_loss_eval += eval_loss.item()
                 total_loss_train += train_loss.item()
                 
+                eval_count += input.size(0)
                 avg_loss_train = total_loss_train/(iter+1.0)
-                avg_loss_eval = total_loss_eval/(iter+1.0)
+                avg_loss_eval = total_loss_eval/eval_count
                 
                 # record
                 t.postfix[0]["eval_loss"] = '%.4f' % avg_loss_eval
