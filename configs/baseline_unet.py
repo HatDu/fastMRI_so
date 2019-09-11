@@ -14,11 +14,11 @@ acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
 data = dict(
     train = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/multicoil_train', 
                 challenge='multicoil', 
-                sample_rate=1.,
+                sample_num=20,
                 acquisition=acquisition
             )
         ),
@@ -48,11 +48,11 @@ data = dict(
     ),
     val = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/multicoil_val', 
                 challenge='multicoil', 
-                sample_rate=1.,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),
@@ -82,11 +82,11 @@ data = dict(
     ),
     test = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/multicoil_test_v2', 
                 challenge='multicoil', 
-                sample_rate=1.,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),

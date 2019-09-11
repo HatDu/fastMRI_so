@@ -1,6 +1,7 @@
 
 def import_model(model_id):
     if model_id == 0:
+        print('using baseline_unet model')
         from .baseline_unet import UnetModel
         return UnetModel
     elif model_id == 1:

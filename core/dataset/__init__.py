@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 
 dataset_dict = {
     'data_slice': ['core.dataset.data_slice',],
+    'data_slicev2': ['core.dataset.data_slicev2',],
     'data_split_multicoil': ['core.dataset.data_split_multicoil',],
     'data_slice_share': ['core.dataset.data_slice_share',],
 }

@@ -7,31 +7,30 @@ import torchvision
 def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
     model.train()
     avg_loss = 0.
-    losses = []
-    start_epoch = start_iter = time.perf_counter()
-    global_step = epoch * len(data_loader)
-    with tqdm(total=len(data_loader), postfix=[dict(loss=0, avg_loss=0)]) as t:
-        for iter, data in enumerate(data_loader):
-            input, target, mean, std, norm = data[:5]
-            input = input.to(cfg.device)
-            target = target.to(cfg.device)
+    total_loss = 0.
 
-            output = model(input).squeeze(1)
-            loss = loss_func(output, target)
+    global_step = epoch * len(data_loader)
+    with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
+        for iter, data in enumerate(data_loader):
+            # featch data
+            input, target, mean, std, norm = data[:5]
+
+            # forward
+            output = model(input.to(cfg.device)).squeeze(1)
+            loss = loss_func(output, target.to(cfg.device))
+            
+            # backward
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            # calculate loss for compare with validate set
-            loss_cp_eval = cal_loss(output, target, mean, std, norm, cfg.device)
-            losses.append(loss_cp_eval.item())
-            avg_loss = 0.99 * avg_loss + 0.01 * loss.item() if iter > 0 else loss.item()
-            writer.add_scalar('TrainLoss', loss.item(), global_step + iter)
 
-            t.postfix[0]["loss"] = '%.4f' % (loss.item())
-            t.postfix[0]["avg_loss"] = '%.4f' % (avg_loss)
+            # log
+            total_loss += loss.item()
+            avg_loss = total_loss / (1.0 + iter)
+            writer.add_scalar('TrainLoss', loss.item(), global_step + iter)
+            t.postfix[0]["avg_loss"] = '%.4f' % (loss.item())
             t.update()
-            start_iter = time.perf_counter()
-    return np.mean(losses), time.perf_counter() - start_epoch
+    return avg_loss
 
 def cal_loss(output, target, mean, std, norm, device):
     mean = mean.unsqueeze(1).unsqueeze(2).to(device)
@@ -40,29 +39,41 @@ def cal_loss(output, target, mean, std, norm, device):
     output = output * std + mean
 
     norm = norm.unsqueeze(1).unsqueeze(2).to(device)
-    
-    # print(norm.dtype, mean.dtype, output.dtype)
+
     norm = norm.float()
     loss = F.mse_loss(output / norm, target / norm, reduction='sum')
     return loss
 
-def evaluate(cfg, epoch, model, data_loader, writer):
+def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
     model.eval()
-    losses = []
-    start = time.perf_counter()
+    total_loss_train = 0.
+    total_loss_eval = 0.
+    avg_loss_train = 0.
+    avg_loss_eval = 0.
     
     with torch.no_grad():
-        with tqdm(total=len(data_loader), postfix=[dict(avg_loss=0)]) as t:
+        with tqdm(total=len(data_loader), postfix=[dict(eval_loss=0., loss_func=0.)]) as t:
             for iter, data in enumerate(data_loader):
+                # featch data
                 input, target, mean, std, norm = data[:5]
-                # input = input.unsqueeze(1).to(cfg.device)
-                target = target.to(cfg.device)
+                input = input.to(cfg.device)
                 output = model(input).squeeze(1)
-                loss = cal_loss(output, target, mean, std, norm, cfg.device)
-                losses.append(loss.item())
-                t.postfix[0]["avg_loss"] = '%.4f' % (np.mean(losses))
+
+                # cal loss
+                target = target.to(cfg.device)
+                train_loss = loss_func(output, target)
+                eval_loss = cal_loss(output, target, mean, std, norm, cfg.device)
+                total_loss_eval += eval_loss.item()
+                total_loss_train += train_loss.item()
+                
+                avg_loss_train = total_loss_train/(iter+1.0)
+                avg_loss_eval = total_loss_eval/(iter+1.0)
+                
+                # record
+                t.postfix[0]["eval_loss"] = '%.4f' % avg_loss_eval
+                t.postfix[0]["eval_lossfunc"] = '%.4f' % avg_loss_train
                 t.update()
-    return np.mean(losses), time.perf_counter() - start
+    return avg_loss_train, avg_loss_eval
 
 
 def visualize(cfg, epoch, model, data_loader, writer):
@@ -76,7 +87,6 @@ def visualize(cfg, epoch, model, data_loader, writer):
     with torch.no_grad():
         for iter, data in enumerate(data_loader):
             input, target = data[:2]
-            # input = input.unsqueeze(1).to(cfg.device)
             target = target.unsqueeze(1).to(cfg.device)
             output = model(input)
             save_image(target, 'Target')
