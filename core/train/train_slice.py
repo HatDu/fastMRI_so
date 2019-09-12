@@ -86,12 +86,21 @@ def visualize(cfg, epoch, model, data_loader, writer):
         writer.add_image(tag, grid, epoch)
 
     model.eval()
+    gt_list = []
+    gen_list = []
+    err_list = []
     with torch.no_grad():
         for iter, data in enumerate(data_loader):
             input, target = data[:2]
             target = target.unsqueeze(1).to(cfg.device)
             output = model(input)
-            save_image(target, 'Target')
-            save_image(output, 'Reconstruction')
-            save_image(torch.abs(target - output), 'Error')
-            break
+            
+            gt_list.append(target)
+            gen_list.append(output)
+            err_list.append(torch.abs(target - output))
+    gt_tensor = torch.cat(gt_list, 0)
+    gen_tensor = torch.cat(gen_list, 0)
+    err_tensor = torch.cat(err_list, 0)
+    save_image(gt_tensor[:16], 'Target')
+    save_image(gen_tensor[:16], 'Reconstruction')
+    save_image(err_tensor[:16], 'Error')

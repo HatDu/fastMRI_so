@@ -2,8 +2,8 @@ model = dict(
     name = 'cascade_net',
     id = 0,
     params = dict(
-        in_chans=15, 
-        out_chans=15, 
+        in_chans=1, 
+        out_chans=1, 
         inter_chans=32,
         nb=5,
         nc=5 
@@ -11,7 +11,7 @@ model = dict(
 )
 
 acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
-batch_size = 16
+batch_size = 4
 data = dict(
     train = dict(
         dataset = dict(

@@ -13,7 +13,7 @@ model = dict(
 )
 
 acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
-batch_size=4
+batch_size=8
 data = dict(
     train = dict(
         dataset = dict(

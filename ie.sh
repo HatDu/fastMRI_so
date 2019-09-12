@@ -1,7 +1,7 @@
 # infer and eval
 
-cfg_file='configs/complex_net.py'
-ckpt='log/complex_net_20/best_model.pt'
+cfg_file='configs/cascadenet.py'
+ckpt='log/cascadenet_20/best_model.pt'
 device='2,3'
 
 # # visualize sensity map

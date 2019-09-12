@@ -10,7 +10,7 @@ class ConvBlock(nn.Module):
         self.activation = nn.ReLU(inplace=False)
     
     def forward(self, x):
-        out = self.conv(x)
-        out = self.bn(x)
+        out = self.convl(x)
+        out = self.bn(out)
         out = self.activation(out)
         return out
