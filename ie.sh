@@ -1,9 +1,13 @@
 # infer and eval
 
-cfg_file='configs/cascadenet.py'
-ckpt='log/cascadenet_20/best_model.pt'
-device='2,3'
+# cfg_file='configs/cascadenet.py'
+# ckpt='log/cascadenet_20/best_model.pt'
+# device='2,3'
 
+cfg_file=$1
+ckpt=$2
+device=$3
+echo $cfg_file
 # # visualize sensity map
 # # CUDA_VISIBLE_DEVICES=$device python tools/vis_sensmap.py --cfg $cfg_file -c $ckpt \
 # #     -i data/multicoil_val/ -o data/infer \

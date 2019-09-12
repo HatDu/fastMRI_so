@@ -16,9 +16,7 @@ class complex_conv2d_groups(nn.Module):
         self.conv_blocks = nn.Sequential(*conv_blocks)
     
     def forward(self, x):
-        tmp = x
         out = self.conv_blocks(x)
-        out += tmp
         return out
 
 class ComplexNet(nn.Module):
@@ -35,8 +33,10 @@ class ComplexNet(nn.Module):
         x0: B,C,H,W,2
         mask: 1,1,1,W,1
         '''
-        x_i = x
+        tmp = x
         for i in range(self.nc):
-            x_i = self.conv_groups[i](x_i)
-            x_i = self.dc(x_i, xk0, mask, self.noise_lvl)
-        return x_i
+            x_i = self.conv_groups[i](tmp)
+            block = x_i + tmp
+            tmp = block
+            # tmp = self.dc(x_i, xk0, mask, self.noise_lvl)
+        return tmp

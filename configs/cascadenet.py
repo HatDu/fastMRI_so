@@ -4,8 +4,8 @@ model = dict(
     params = dict(
         in_chans=1, 
         out_chans=1, 
-        inter_chans=32,
-        nb=5,
+        inter_chans=64,
+        nb=10,
         nc=5 
     )
 )

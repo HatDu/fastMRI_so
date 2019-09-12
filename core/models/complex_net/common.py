@@ -26,6 +26,7 @@ class complex_conv2d(nn.Module):
         out_real = (a - d).view((B, C, H, W, 1))
         out_imag = (b + c).view((B, C, H, W, 1))
         out = torch.cat((out_real, out_imag), -1)
+        # print(out.size())
         if self.activation:
             out = self.activation(out)
         return out
