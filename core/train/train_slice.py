@@ -15,11 +15,7 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
         for iter, data in enumerate(data_loader):
             # featch data
             input, target, mean, std, norm = data[:5]
-            
-            # # draw network graph
-            # if not is_draw:
-            #     writer.add_graph(model, (input.to(cfg.device), ))
-            #     is_draw = True
+
             # forward
             output = model(input.to(cfg.device)).squeeze(1)
             loss = loss_func(output, target.to(cfg.device))
@@ -67,7 +63,7 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 # cal loss
                 target = target.to(cfg.device)
                 train_loss = loss_func(output, target)
-                eval_loss = cal_loss(input.squeeze(1), target, mean, std, norm, cfg.device)
+                eval_loss = cal_loss(output.squeeze(1), target, mean, std, norm, cfg.device)
                 total_loss_eval += eval_loss.item()
                 total_loss_train += train_loss.item()
                 
