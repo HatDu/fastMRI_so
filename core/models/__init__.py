@@ -4,7 +4,8 @@ model_dict = dict(
     baseline_unet = 'core.models.unet',
     se_unet = 'core.models.sequeeze_excitation',
     sens_fusion = 'core.models.sens_fusion',
-    complex_net = 'core.models.complex_net'
+    complex_net = 'core.models.complex_net',
+    cascade_net = 'core.models.cascadenet'
 )
 
 def build_model(cfg):
