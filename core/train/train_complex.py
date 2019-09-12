@@ -63,13 +63,13 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 loss_f = loss_func(output, target_image.to(output.device))
 
                 out_img = reconstruction_img(output, mean, std)
-                norm = norm.view(len(norm), 1, 1, 1, 1).float().to(out_img.device)
+                norm = norm.view(len(norm), 1, 1).float().to(out_img.device)
                 loss_eval = F.mse_loss(out_img / norm, target_rss.to(out_img.device) / norm, reduction='sum')
                 
                 total_func_loss += loss_f.item() 
                 total_eval_loss += loss_eval.item()
                 count += masked_image.size(0)
-                avg_eval_loss = (total_eval_loss/count)*10.
+                avg_eval_loss = (total_eval_loss/count)*100.
                 avg_func_loss = total_func_loss/(iter + 1.)
                 t.postfix[0]["eval_loss"] = '%.4f' % (avg_eval_loss)
                 t.postfix[0]["func_loss"] = '%.4f' % (avg_func_loss)
