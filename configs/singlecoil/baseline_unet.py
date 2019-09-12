@@ -11,14 +11,15 @@ model = dict(
 )
 
 acquisition = ['CORPD_FBK', 'CORPDFS_FBK']
+batch_size = 16
 data = dict(
     train = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/singlecoil_train', 
                 challenge='singlecoil', 
-                sample_rate=1.,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),
@@ -34,13 +35,13 @@ data = dict(
             params = dict(
                 resolution=320, 
                 which_challenge='singlecoil', 
-                use_seed=True, 
+                use_seed=False, 
                 crop=False, 
                 crop_size=160
             )
         ),
         loader = dict(
-            batch_size=16,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
             pin_memory=True,
@@ -48,11 +49,11 @@ data = dict(
     ),
     val = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/singlecoil_val', 
                 challenge='singlecoil', 
-                sample_rate=1.,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),
@@ -74,19 +75,19 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=16,
-            shuffle=True,
+            batch_size=batch_size,
+            shuffle=False,
             num_workers=4,
             pin_memory=True,
         )
     ),
     test = dict(
         dataset = dict(
-            name = 'data_slice',
+            name = 'data_slicev2',
             params = dict(
                 root='data/singlecoil_test_v2', 
                 challenge='singlecoil', 
-                sample_rate=1.,
+                sample_num=-1,
                 acquisition=acquisition
             )
         ),
@@ -105,15 +106,15 @@ data = dict(
             )
         ),
         loader = dict(
-            batch_size=16,
-            shuffle=True,
+            batch_size=batch_size,
+            shuffle=False,
             num_workers=4,
             pin_memory=True,
         )
     )
 )
 
-logdir = 'log/s_baseline_unet/'
+logdir = 'log/baseline_unet/'
 
 train = dict(
     optimizer = dict(
