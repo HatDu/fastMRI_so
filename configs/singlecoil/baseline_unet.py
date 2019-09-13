@@ -118,7 +118,7 @@ logdir = 'log/baseline_unet/'
 
 train = dict(
     optimizer = dict(
-        name = 'Adam', params=dict(lr=1e-3, weight_decay=0.)
+        name = 'RMSprop', params=dict(lr=1e-3, weight_decay=0.)
     ),
     lr_scheduler=dict(
         name = 'StepLR',

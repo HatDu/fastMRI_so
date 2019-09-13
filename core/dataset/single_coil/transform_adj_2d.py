@@ -1,7 +1,8 @@
 from core.dataset import transforms
 import numpy as np
+import torch
 class DataTransform:
-    def __init__(self, mask_func, resolution, which_challenge, use_seed=True, crop=False, crop_size=96):
+    def __init__(self, mask_func, resolution, which_challenge, fusion='zero_mean', use_seed=True, crop=False, crop_size=96):
         if which_challenge not in ('singlecoil', 'multicoil'):
             raise ValueError(f'Challenge should either be "singlecoil" or "multicoil"')
         self.mask_func = mask_func
@@ -10,11 +11,19 @@ class DataTransform:
         self.use_seed = use_seed
         self.crop = crop
         self.crop_size = crop_size
-    def __call__(self, kspace, target, norm, fname, slice):
+        self.fusion = fusion
+    def __call__(self, kspace, center_id, target, norm, fname, slice):
         kspace = transforms.to_tensor(kspace)
         # Apply mask
         seed = None if not self.use_seed else tuple(map(ord, fname))
-        masked_kspace, mask = transforms.apply_mask(kspace, self.mask_func, seed)
+        images, masked_kspaces, masks = [], [], []
+        for i in range(kspace.size(0)):
+            masked_kspace, mask = transforms.apply_mask(kspace[i], self.mask_func, seed)
+            image = transforms.ifft2(masked_kspace)
+            masked_kspaces.append(masked_kspace.view(1, *masked_kspace.size()))
+            masks.append(mask.view(1, *mask.size()))
+            images.append(image.view(1, *image.size()))
+        
         # Inverse Fourier Transform to get zero filled solution
         image = transforms.ifft2(masked_kspace)
         # Crop input image
@@ -42,4 +51,3 @@ class DataTransform:
                 target = target[..., ih: ih + self.crop_size,iw: iw + self.crop_size]
         image = image.unsqueeze(0)
         return image, target, mean, std, norm, fname, slice
-        # return image, np.abs(target)
