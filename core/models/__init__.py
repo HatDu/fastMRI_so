@@ -5,7 +5,8 @@ model_dict = dict(
     se_unet = 'core.models.sequeeze_excitation',
     sens_fusion = 'core.models.sens_fusion',
     complex_net = 'core.models.complex_net',
-    cascade_net = 'core.models.cascadenet'
+    cascade_net = 'core.models.cascadenet',
+    dncn='core.models.DnCn',
 )
 
 def build_model(cfg):

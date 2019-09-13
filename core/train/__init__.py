@@ -28,11 +28,14 @@ def get_train_func(cfg):
     if func_cfg.name == 'train_slice':
         from core.train.train_slice import train_epoch, evaluate, visualize
         return train_epoch, evaluate, visualize
-    if func_cfg.name == 'train_fusion_silce':
+    elif func_cfg.name == 'train_fusion_silce':
         from core.train.train_fusion_silce import train_epoch, evaluate, visualize
         return train_epoch, evaluate, visualize
-    if func_cfg.name == 'train_complex':
+    elif func_cfg.name == 'train_complex':
         from core.train.train_complex import train_epoch, evaluate, visualize
+        return train_epoch, evaluate, visualize
+    elif func_cfg.name == 'train_dncn':
+        from core.train.train_dncn import train_epoch, evaluate, visualize
         return train_epoch, evaluate, visualize
 
 def save_model(log_dir, epoch, model, optimizer, best_dev_loss, is_new_best):

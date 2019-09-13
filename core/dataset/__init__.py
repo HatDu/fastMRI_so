@@ -13,6 +13,7 @@ transform_dict = {
     'transform_slice_wo_rss': ['core.dataset.transform_slice_wo_rss',],
     'transform_complex': ['core.dataset.transform_complex',],
     'transform_slice_share': ['core.dataset.transform_slice_share',],
+    'transform_dncn': ['core.dataset.single_coil.transform_dncn',],
 }
 
 mask_dict = {

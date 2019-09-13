@@ -84,5 +84,5 @@ class MaskFunc:
         mask2d_shape = [1 for _ in shape]
         mask2d_shape[-2] = num_cols
         mask2d_shape[-3] = num_rows
-        mask_2d = np.ones(mask2d_shape)
+        mask_2d = np.ones(mask2d_shape).astype(np.float32)
         return torch.tensor(mask_2d*mask)
