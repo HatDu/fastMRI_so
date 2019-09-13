@@ -12,17 +12,24 @@ class DataTransform:
         self.crop = crop
         self.crop_size = crop_size
         self.fusion = fusion
-    def __call__(self, kspace, center_id, target, norm, fname, slice):
-        kspace = transforms.to_tensor(kspace)
+    def __call__(self, kspaces, center_id, targets, norm, fname, slices):
+        kspaces = transforms.to_tensor(kspaces)
         # Apply mask
-        seed = None if not self.use_seed else tuple(map(ord, fname))
-        images, masked_kspaces, masks = [], [], []
-        for i in range(kspace.size(0)):
-            masked_kspace, mask = transforms.apply_mask(kspace[i], self.mask_func, seed)
-            image = transforms.ifft2(masked_kspace)
-            masked_kspaces.append(masked_kspace.view(1, *masked_kspace.size()))
+        seed = None if not self.use_seed else tuple(map(ord, fname+str(slices[center_id])))
+        images, imageks, mimages, mimageks, masks = [], [], [], [], []
+        raw_images = transforms.ifft2(kspaces)
+        raw_images = transforms.complex_center_crop(image, (self.resolution, self.resolution))
+        for i in range(kspaces.size(0)):
+            img = raw_images[i]
+            imgk = transforms.fft2(data)
+            mimgk, mask = mask = transforms.apply_mask(imgk, self.mask_func, seed)
+            mimg = transforms.ifft2(mimgk)
+
+            images.append(img.view(1, *img.size()))
+            imagesk.append(imgk.view(1, *imgk.size()))
+            mimages.append(mimg.view(1, *mimg.size()))
+            mimageks.append(mimgk.view(1, *mimgk.size()))
             masks.append(mask.view(1, *mask.size()))
-            images.append(image.view(1, *image.size()))
         
         # Inverse Fourier Transform to get zero filled solution
         image = transforms.ifft2(masked_kspace)
