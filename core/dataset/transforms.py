@@ -42,7 +42,6 @@ def apply_mask(data, mask_func, seed=None):
             mask (torch.Tensor): The generated mask
     """
     shape = np.array(data.shape)
-    shape[:-3] = 1
     mask = mask_func(shape, seed)
     return torch.where(mask == 0, torch.Tensor([0]), data), mask
 

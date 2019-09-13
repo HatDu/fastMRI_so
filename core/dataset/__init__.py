@@ -16,7 +16,8 @@ transform_dict = {
 }
 
 mask_dict = {
-    'mask_cartesian': ['core.dataset.mask_cartesian',],
+    'mask_cartesian': ['core.dataset.mask.mask_cartesian',],
+    'mask_cartesian2d': ['core.dataset.mask.mask_cartesian2d',],
 }
 
 def get_dataset(name):

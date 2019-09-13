@@ -7,7 +7,7 @@ LICENSE file in the root directory of this source tree.
 
 import numpy as np
 import torch
-
+from numpy.lib.stride_tricks import as_strided
 
 class MaskFunc:
     """
@@ -63,7 +63,7 @@ class MaskFunc:
             raise ValueError('Shape should have 3 or more dimensions')
 
         self.rng.seed(seed)
-        num_cols = shape[-2]
+        num_rows, num_cols = shape[-3: -1]
 
         choice = self.rng.randint(0, len(self.accelerations))
         center_fraction = self.center_fractions[choice]
@@ -79,6 +79,10 @@ class MaskFunc:
         # Reshape the mask
         mask_shape = [1 for _ in shape]
         mask_shape[-2] = num_cols
-        mask = torch.from_numpy(mask.reshape(*mask_shape).astype(np.float32))
-
-        return mask
+        mask = mask.reshape(*mask_shape).astype(np.float32)
+        # 2d mask
+        mask2d_shape = [1 for _ in shape]
+        mask2d_shape[-2] = num_cols
+        mask2d_shape[-3] = num_rows
+        mask_2d = np.ones(mask2d_shape)
+        return torch.tensor(mask_2d*mask)
