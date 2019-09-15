@@ -57,8 +57,8 @@ def main():
     # Data Parallel training
     if args.data_parallel:
         model = torch.nn.DataParallel(model)
-    checkpoint = torch.load(args.ckpt)
-    model.load_state_dict(checkpoint['model'])
+    # checkpoint = torch.load(args.ckpt)
+    # model.load_state_dict(checkpoint['model'])
 
     # data
     dataloader = create_infer_dataloader(cfg)

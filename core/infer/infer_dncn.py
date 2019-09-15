@@ -14,7 +14,9 @@ def run_net(args, model, data_loader):
             subimg, subimgk, image, imagek, mask, target = data
             # mean, std, norm = norm
             fnames, slices = file_info
-            recons = model(subimg, subimgk, mask)
+            recons = model(subimg)
+            # recons = subimg
+            # recons = image
             recons = recons.permute(0,2,3,1)
             # recons = masked_image
             # b, c, h, w, _ = recons.shape

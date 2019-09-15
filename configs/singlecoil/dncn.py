@@ -2,7 +2,7 @@ model = dict(
     name = 'dncn',
     id = 0,
     params = dict(
-        n_channels=2, nc=5, nd=5,
+        n_channels=2, nc=2, nd=3,
         nf=32, bn=False, nl='lrelu', conv_dim=2
     )
 )
