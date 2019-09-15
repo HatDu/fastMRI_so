@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('-acq', '--acquisition', default='both')
     parser.add_argument('-i', '--input_dir', default=None)
     parser.add_argument('-o', '--out_dir', default='data/infer')
+    parser.add_argument('--count', type=int, default=-1,help='number of samples')
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--data_parallel', action='store_true', default=True)
     args = parser.parse_args()
@@ -48,6 +49,7 @@ def main():
     cfg.acquisition = acquisition[args.acquisition]
     if args.input_dir is not None:
         cfg.data.test.dataset.params.root = args.input_dir
+    cfg.data.test.dataset.params.sample_num = args.count
     # Log
     out_dir = args.out_dir
     pathlib.Path(out_dir).mkdir(parents=True, exist_ok=True)
@@ -57,8 +59,8 @@ def main():
     # Data Parallel training
     if args.data_parallel:
         model = torch.nn.DataParallel(model)
-    # checkpoint = torch.load(args.ckpt)
-    # model.load_state_dict(checkpoint['model'])
+    checkpoint = torch.load(args.ckpt)
+    model.load_state_dict(checkpoint['model'])
 
     # data
     dataloader = create_infer_dataloader(cfg)

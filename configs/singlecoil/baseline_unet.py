@@ -53,7 +53,7 @@ data = dict(
             params = dict(
                 root='data/singlecoil_val', 
                 challenge='singlecoil', 
-                sample_num=-1,
+                sample_num=50,
                 acquisition=acquisition
             )
         ),

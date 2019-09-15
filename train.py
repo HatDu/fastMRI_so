@@ -119,8 +119,8 @@ def main():
         is_new_best = dev_loss < best_dev_loss
         best_dev_loss = min(best_dev_loss, dev_loss)
         save_model(logdir, epoch, model, optimizer, best_dev_loss, is_new_best)
-        if (epoch+1) % 5 == 0:
-            time.sleep(60)
+        # if (epoch+1) % 5 == 0:
+        #     time.sleep(60)
     writer.close()
 
 

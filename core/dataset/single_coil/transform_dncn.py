@@ -21,9 +21,14 @@ class DataTransform:
         subimgk, mask = transforms.apply_mask(imagek, self.mask_func, seed)
         # Inverse Fourier Transform to get zero filled solution
         subimg = transforms.ifft2(subimgk)
-        
+        _, mean, std = transforms.normalize_instance(transforms.complex_abs(subimg), eps=1e-11)
+        subimg = transforms.normalize(subimg, mean, std, eps=1e-11)
+        subimgk = transforms.normalize(subimgk, mean, std, eps=1e-11)
+        image = transforms.normalize(image, mean, std, eps=1e-11)
+        imagek = transforms.normalize(imagek, mean, std, eps=1e-11)
         if target is not None:
             target = transforms.to_tensor(target)
+            target = transforms.normalize(target, mean, std, eps=1e-11)
 
         if self.crop:
             ih = np.random.randint(0, self.resolution - self.crop_size)
@@ -31,9 +36,8 @@ class DataTransform:
             image = image[..., ih: ih + self.crop_size, iw: iw + self.crop_size]
             if target is not None:
                 target = target[..., ih: ih + self.crop_size,iw: iw + self.crop_size]
-        # print(subimg.size(), mask.size())
-        # torch.Size([320, 320, 2]) torch.Size([320, 320, 1])
+        # print(subimg.size(), subimgk.size(), image.size())
         data = [subimg.permute(2,0,1), subimgk.permute(2,0,1), image.permute(2,0,1), imagek.permute(2,0,1), mask.permute(2,0,1), target]
-        norm = [norm]
+        norm = [mean, std, norm]
         file_info = [fname, slice]
         return [data, norm, file_info]

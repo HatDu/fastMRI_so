@@ -3,7 +3,7 @@ model = dict(
     id = 0,
     params = dict(
         n_channels=2, nc=2, nd=3,
-        nf=32, bn=False, nl='lrelu', conv_dim=2
+        nf=16, bn=False, nl='lrelu', conv_dim=2
     )
 )
 
@@ -50,7 +50,7 @@ data = dict(
             params = dict(
                 root='data/singlecoil_val', 
                 challenge='singlecoil', 
-                sample_num=-1,
+                sample_num=50,
                 acquisition=acquisition
             )
         ),
