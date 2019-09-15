@@ -37,6 +37,9 @@ def get_train_func(cfg):
     elif func_cfg.name == 'train_dncn':
         from core.train.train_dncn import train_epoch, evaluate, visualize
         return train_epoch, evaluate, visualize
+    elif func_cfg.name == 'train_fusion':
+        from core.train.train_fusion import train_epoch, evaluate, visualize
+        return train_epoch, evaluate, visualize
 
 def save_model(log_dir, epoch, model, optimizer, best_dev_loss, is_new_best):
     torch.save(

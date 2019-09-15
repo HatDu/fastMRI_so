@@ -6,6 +6,7 @@ dataset_dict = {
     'data_slicev2': ['core.dataset.data_slicev2',],
     'data_split_multicoil': ['core.dataset.data_split_multicoil',],
     'data_slice_share': ['core.dataset.data_slice_share',],
+    'data_slice_adj_2d': ['core.dataset.single_coil.data_slice_adj_2d',],
 }
 
 transform_dict = {
@@ -14,6 +15,7 @@ transform_dict = {
     'transform_complex': ['core.dataset.transform_complex',],
     'transform_slice_share': ['core.dataset.transform_slice_share',],
     'transform_dncn': ['core.dataset.single_coil.transform_dncn',],
+    'transform_adj_2d': ['core.dataset.single_coil.transform_adj_2d',],
 }
 
 mask_dict = {

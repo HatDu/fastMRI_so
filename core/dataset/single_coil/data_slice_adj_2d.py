@@ -13,12 +13,13 @@ from torch.utils.data import Dataset
 import numpy as np
 
 class MRI_Data(Dataset):
-    def __init__(self, transform, root, challenge, acquisition, sample_num=-1):
+    def __init__(self, transform, root, challenge, acquisition, sample_num=-1, neigh=2):
         if challenge not in ('singlecoil', 'multicoil'):
             raise ValueError('challenge should be either "singlecoil" or "multicoil"')
 
         self.transform = transform
         self.acquisition = acquisition
+        self.neigh = neigh
         self.recons_key = 'reconstruction_esc' if challenge == 'singlecoil' \
             else 'reconstruction_rss'
 
@@ -61,4 +62,4 @@ class MRI_Data(Dataset):
             kspace = data['kspace'][neigh_l: neight_r]
             target = data[self.recons_key][neigh_l: neight_r] if self.recons_key in data else None
             center_id = slice - neigh_l
-            return self.transform(kspace, center_id, target, data.attrs, fname.name, slice)
+            return self.transform(kspace, center_id, target, data.attrs['norm'], fname.name, slice)
