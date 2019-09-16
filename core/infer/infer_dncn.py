@@ -12,11 +12,14 @@ def run_net(args, model, data_loader):
         for batch in tqdm(data_loader):
             data, norm, file_info = batch
             subimg, subimgk, image, imagek, mask, target = data
-            # mean, std, norm = norm
+            mean, std, norm = norm
             fnames, slices = file_info
-            recons = model(subimg, subimgk, mask)
+            recons = model(subimg)
             # recons = subimg
             # recons = image
+            mean = mean.view(subimg.size(0), 1, 1, 1).to(recons.device)
+            std = std.view(subimg.size(0), 1, 1, 1).to(recons.device)
+            recons = recons*std + mean
             recons = recons.permute(0,2,3,1)
             # recons = masked_image
             # b, c, h, w, _ = recons.shape
