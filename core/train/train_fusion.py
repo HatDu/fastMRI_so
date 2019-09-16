@@ -18,8 +18,10 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             subimg, subimgk, image, imagek, mask, target = data
 
             # forward and backward
-            output = model(subimg)
-            loss = loss_func(output, image.to(cfg.device))
+            output = model(subimg) 
+            output = output.squeeze(1)
+            target = target.to(output.device)
+            loss = loss_func(output, target)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -47,16 +49,19 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
             for iter, batch in enumerate(data_loader):
                 data, norm, file_info = batch
                 subimg, subimgk, image, imagek, mask, target = data
+                
                 mean, std, norm = norm
-                # output = model(subimg)
-                output = subimg
-                loss_f = loss_func(output, image.to(output.device))
+                output = model(subimg)
+                # output = subimg     
+                output = output.squeeze(1)
+                target = target.to(output.device)
+                loss_f = loss_func(output, target)
                 # none 0.2067, 0.4032
-                mean = mean.view(subimg.size(0), 1, 1, 1).to(output.device)
-                std = std.view(subimg.size(0), 1, 1, 1).to(output.device)
+                mean = mean.view(subimg.size(0), 1, 1).to(output.device)
+                std = std.view(subimg.size(0), 1, 1).to(output.device)
                 output = output*std + mean
-                target = target.to(output.device)*std.squeeze(1) + mean.squeeze(1)
-                out_img = transforms.complex_abs(output)
+                target = target.to(output.device)*std + mean
+                out_img = output
                 
                 norm = norm.view(len(norm), 1, 1).float().to(out_img.device)
                 loss_eval = F.mse_loss(out_img / norm, target.to(out_img.device) / norm, reduction='sum')
@@ -89,11 +94,12 @@ def visualize(cfg, epoch, model, data_loader, writer):
             subimg, subimgk, image, imagek, mask, target = data
             mean, std, norm = norm
             output = model(subimg)
-            mean = mean.view(subimg.size(0), 1, 1, 1).to(output.device)
-            std = std.view(subimg.size(0), 1, 1, 1).to(output.device)
+            # output = subimg     
+            output = output.squeeze(1)
+            mean = mean.view(subimg.size(0), 1, 1).to(output.device)
+            std = std.view(subimg.size(0), 1, 1).to(output.device)
             output = output*std + mean
-            target = target.to(output.device)*std.squeeze(1) + mean.squeeze(1)
-            out_img = transforms.complex_abs(output.permute(0,2,3,1))
+            out_img = output
 
             gt_list.append(target.unsqueeze(1))
             gen_list.append(out_img.unsqueeze(1))
