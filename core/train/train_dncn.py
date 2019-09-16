@@ -18,7 +18,7 @@ def train_epoch(cfg, epoch, model, data_loader, optimizer, loss_func, writer):
             subimg, subimgk, image, imagek, mask, target = data
 
             # forward and backward
-            output = model(subimg)
+            output = model(subimg, subimgk, mask)
             loss = loss_func(output, image.to(cfg.device))
             optimizer.zero_grad()
             loss.backward()
@@ -48,15 +48,17 @@ def evaluate(cfg, epoch, model, data_loader, loss_func, writer):
                 data, norm, file_info = batch
                 subimg, subimgk, image, imagek, mask, target = data
                 mean, std, norm = norm
-                output = model(subimg)
-                # output = subimg
+                output = model(subimg, subimgk, mask)
+                # output = image
                 loss_f = loss_func(output, image.to(output.device))
                 # none 0.2067, 0.4032
                 mean = mean.view(subimg.size(0), 1, 1, 1).to(output.device)
                 std = std.view(subimg.size(0), 1, 1, 1).to(output.device)
                 output = output*std + mean
                 target = target.to(output.device)*std.squeeze(1) + mean.squeeze(1)
-                out_img = transforms.complex_abs(output.permute(0,2,3,1))
+                output = output.permute(0,2,3,1)
+                # output = transforms.ifft2(output)
+                out_img = transforms.complex_abs(output)
                 
                 norm = norm.view(len(norm), 1, 1).float().to(out_img.device)
                 loss_eval = F.mse_loss(out_img / norm, target.to(out_img.device) / norm, reduction='sum')
@@ -88,7 +90,7 @@ def visualize(cfg, epoch, model, data_loader, writer):
             data, norm, file_info = batch
             subimg, subimgk, image, imagek, mask, target = data
             mean, std, norm = norm
-            output = model(subimg)
+            output = model(subimg, subimgk, image)
             mean = mean.view(subimg.size(0), 1, 1, 1).to(output.device)
             std = std.view(subimg.size(0), 1, 1, 1).to(output.device)
             output = output*std + mean

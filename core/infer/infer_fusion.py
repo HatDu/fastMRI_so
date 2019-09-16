@@ -11,23 +11,17 @@ def run_net(args, model, data_loader):
     with torch.no_grad():
         for batch in tqdm(data_loader):
             data, norm, file_info = batch
+            fnames, slices = file_info
             subimg, subimgk, image, imagek, mask, target = data
             mean, std, norm = norm
-            fnames, slices = file_info
-            recons = model(subimg, subimgk, mask)
-            # recons = subimg
-            # recons = image
-            mean = mean.view(subimg.size(0), 1, 1, 1).to(recons.device)
-            std = std.view(subimg.size(0), 1, 1, 1).to(recons.device)
-            recons = recons*std + mean
-            recons = recons.permute(0,2,3,1)
-            # recons = masked_image
-            # b, c, h, w, _ = recons.shape
-            # mean = mean.view(b, 1, 1, 1, 1).to(recons.device)
-            # std = std.view(b, 1, 1, 1, 1).to(recons.device)
-            # recons = recons*std + mean
-            # recons = transforms.ifft2(recons)
-            recons = transforms.complex_abs(recons)
+            output = model(subimg)
+            # output = subimg     
+            output = output.squeeze(1)
+            mean = mean.view(subimg.size(0), 1, 1).to(output.device)
+            std = std.view(subimg.size(0), 1, 1).to(output.device)
+            output = output*std + mean
+
+            recons = output.unsqueeze(1)
             recons = recons.cpu()
             for i in range(recons.shape[0]):
                 reconstructions[fnames[i]].append((slices[i].numpy(), recons[i].numpy()))

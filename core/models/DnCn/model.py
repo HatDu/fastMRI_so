@@ -76,6 +76,6 @@ class DnCn(nn.Module):
         for i in range(self.nc):
             x_cnn = self.conv_blocks[i](x)
             x = x + x_cnn
-            # x = self.dcs[i].perform(x, k, m)
+            x = self.dcs[i].perform(x, k, m)
 
         return x

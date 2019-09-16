@@ -106,8 +106,8 @@ def main():
         # modify lr
         scheduler.step(epoch)
         # train, eval and visualize
-        train_loss = train_func(
-            cfg, epoch, model, train_loader, optimizer, loss_func, writer)
+        # train_loss = train_func(
+        #     cfg, epoch, model, train_loader, optimizer, loss_func, writer)
         dev_loss_train, dev_loss = eval_func(
             cfg, epoch, model, dev_loader, loss_func, writer)
         visualize(cfg, epoch, model, display_loader, writer)
