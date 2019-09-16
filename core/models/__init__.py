@@ -6,13 +6,13 @@ model_dict = dict(
     sens_fusion = 'core.models.sens_fusion',
     complex_net = 'core.models.complex_net',
     cascade_net = 'core.models.cascadenet',
-    dncn='core.models.DnCn',
+    CRNN_MRI='core.models.cascadenet_pytorch',
 )
 
 def build_model(cfg):
     model_cfg = cfg.model
     if model_cfg.name not in model_dict.keys():
-        raise 'No such transform type'
+        raise 'No such model type'
     module = importlib.import_module(model_dict[model_cfg.name])
     Model = module.import_model(model_cfg.id)
     model = Model(**model_cfg.params)
